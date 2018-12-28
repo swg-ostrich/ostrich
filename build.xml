@@ -90,11 +90,13 @@
 	</target>
 	
 	<target name="set_gcc" if="${use_gcc}">
+		<echo>Using the GCC compiler</echo>
 		<property name="cc_compiler" value="gcc"/>
 		<property name="cxx_compiler" value="g++"/>
 	</target>
 	
 	<target name="set_clang" unless="${use_gcc}">
+		<echo>Using the CLang compiler</echo>
 		<property name="cc_compiler" value="clang"/>
 		<property name="cxx_compiler" value="clang++"/>
 	</target>
