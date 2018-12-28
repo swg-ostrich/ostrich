@@ -8,6 +8,7 @@
 	
 	<!-- Global Properties -->	
 	<property name="build" location="${basedir}/build"/>
+	
 	<!-- Database Service Name is derived to make it easier in the properties file -->
 	<property name="service_name" value="//${server_ip_address}/${db_service}"/>
 	
@@ -80,6 +81,22 @@
 			<equals arg1="${src_build_type}" arg2="Debug"/>
 		</condition>
 		<echo>Creating a ${src_build_type} build</echo>
+		<condition property="use_gcc">
+			<equals arg1="${compiler}" arg2="gcc"/>
+		</condition>
+	</target>
+	
+	<target name="set_compiler" description="sets the compiler to use based on what is set in build.properties" depends="set_gcc,set_clang">
+	</target>
+	
+	<target name="set_gcc" if="${use_gcc}">
+		<property name="cc_compiler" value="gcc"/>
+		<property name="cxx_compiler" value="g++"/>
+	</target>
+	
+	<target name="set_clang" unless="${use_gcc}">
+		<property name="cc_compiler" value="clang"/>
+		<property name="cxx_compiler" value="clang++"/>
 	</target>
 	
 	<!-- Gets the number of processors at our disposal -->
@@ -155,11 +172,11 @@
 	</target>
 	
 	<!-- Creates the Make files for our SRC that will be used during compile stage (Intel) -->
-	<target name="prepare_src_x86" depends="init,get_arch" description="prepare server code - Intel" if="compile.x86">
+	<target name="prepare_src_x86" depends="init,get_arch,set_compiler" description="prepare server code - Intel" if="compile.x86">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-			<env key="CC" value="clang"/>
-			<env key="CXX" value="clang++"/>
+			<env key="CC" value="${cc_compiler}"/>
+			<env key="CXX" value="${cxx_compiler}"/>
 			<env key="LDFLAGS" value="-L/usr/lib32"/>
 			<env key="CMAKE_PREFIX_PATH" value="/usr/lib32:/lib32:/usr/lib/i386-linux-gnu:/usr/include/i386-linux-gnu"/>
 			<arg value="-DCMAKE_C_FLAGS=-m32"/>
@@ -173,11 +190,11 @@
 	</target>	
 	
 	<!-- Creates the Make files for our SRC that will be used during compile stage (Non-Intel) -->
-	<target name="prepare_src" depends="init,get_arch" description="compile server code - non Intel" unless="compile.x86">
+	<target name="prepare_src" depends="init,get_arch,set_compiler" description="compile server code - non Intel" unless="compile.x86">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-			<env key="CC" value="clang"/>
-			<env key="CXX" value="clang++"/>
+			<env key="CC" value="${cc_compiler}"/>
+			<env key="CXX" value="${cxx_compiler}"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
 			<arg value="${src}"/>
 		</exec>
