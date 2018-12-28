@@ -206,6 +206,7 @@
 	
 	<target name="strip_src" unless="${is_debug_build}" description="removes debugging information from release builds, making them smaller">
 		<exec executable="strip" dir="${build}">
+			<env key="LD_LIBRARY_PATH" value="${env.LD_LIBRARY_PATH}:${env.ORACLE_HOME}/lib:/usr/include/oracle/12.2/client:"/>
 			<arg value="-d"/>
 			<arg value="bin/*"/>
 		</exec>
