@@ -177,6 +177,7 @@
 	<target name="prepare_src_x86" depends="init,get_arch,set_compiler" description="prepare server code - Intel" if="compile.x86">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<env key="LD_LIBRARY_PATH" value="${env.LD_LIBRARY_PATH}:${env.ORACLE_HOME}/lib:/usr/include/oracle/12.2/client:"/>
 			<env key="CC" value="${cc_compiler}"/>
 			<env key="CXX" value="${cxx_compiler}"/>
 			<env key="LDFLAGS" value="-L/usr/lib32"/>
@@ -195,6 +196,7 @@
 	<target name="prepare_src" depends="init,get_arch,set_compiler" description="compile server code - non Intel" unless="compile.x86">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<env key="LD_LIBRARY_PATH" value="${env.LD_LIBRARY_PATH}:${env.ORACLE_HOME}/lib:/usr/include/oracle/12.2/client:"/>
 			<env key="CC" value="${cc_compiler}"/>
 			<env key="CXX" value="${cxx_compiler}"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
