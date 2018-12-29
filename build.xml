@@ -44,6 +44,10 @@
 		<mkdir dir="${data_shared}"/>
 		<mkdir dir="${data_client}"/>
 	</target>
+
+	<target name="echoprops">
+		<echoproperties/>
+	</target>
 	
 	<target name="swg" description="builds the entire SWG codebase for the first run" depends="clean,git_all_update,update_configs,create_database,compile">
 	</target>
@@ -177,7 +181,6 @@
 	<target name="prepare_src_x86" depends="init,get_arch,set_compiler" description="prepare server code - Intel" if="compile.x86">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-			<env key="LD_LIBRARY_PATH" value="${env.LD_LIBRARY_PATH}:${env.ORACLE_HOME}/lib:/usr/include/oracle/12.2/client:"/>
 			<env key="CC" value="${cc_compiler}"/>
 			<env key="CXX" value="${cxx_compiler}"/>
 			<env key="LDFLAGS" value="-L/usr/lib32"/>
@@ -196,7 +199,6 @@
 	<target name="prepare_src" depends="init,get_arch,set_compiler" description="compile server code - non Intel" unless="compile.x86">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-			<env key="LD_LIBRARY_PATH" value="${env.LD_LIBRARY_PATH}:${env.ORACLE_HOME}/lib:/usr/include/oracle/12.2/client:"/>
 			<env key="CC" value="${cc_compiler}"/>
 			<env key="CXX" value="${cxx_compiler}"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
@@ -206,7 +208,6 @@
 	
 	<target name="strip_src" unless="${is_debug_build}" description="removes debugging information from release builds, making them smaller">
 		<exec executable="strip" dir="${build}">
-			<env key="LD_LIBRARY_PATH" value="${env.LD_LIBRARY_PATH}:${env.ORACLE_HOME}/lib:/usr/include/oracle/12.2/client:"/>
 			<arg value="-d"/>
 			<arg value="bin/*"/>
 		</exec>
@@ -215,6 +216,8 @@
 	<!-- Compiles the SRC (C++) code -->
 	<target name="compile_src" description="compile server code" depends="init,prepare_src,prepare_src_x86,get_num_procs,strip_src">
 		<exec executable="make" dir="${build}" failonerror="true">
+			<env key="CC" value="${cc_compiler}"/>
+			<env key="CXX" value="${cxx_compiler}"/>
 			<arg value="-j${nproc}"/>
 		</exec>
 	</target>
@@ -228,7 +231,7 @@
 	</target>
 	
 	<!-- Compiles all code necessary for server execution -->
-	<target name="compile" depends="compile_src,compile_java,compile_miff,compile_tpf,compile_tab,load_templates">
+	<target name="compile" depends="compile_src,compile_java,compile_miff,compile_tpf,compile_tab">
 	</target>
 	
 	<!-- Compiles all .mif files -->
@@ -324,7 +327,7 @@
 	<!-- Executes the generated Template CRC SQL in SQL*Plus -->
 	<target name="load_templates" description="loads generated templates into the database" depends="process_templates">
 		<exec executable="sqlplus" dir="${build}">
-			<arg value="${db_username}/${db_password}@${service_name}"/>
+			<arg value="${db_username}/${db_password}@${server_ip_address}/${db_service}"/>
 			<arg value="@${templates_sql_file}"/>
         </exec>
 	</target>
@@ -337,7 +340,7 @@
 			<arg value="database_update.pl"/>
 			<arg value="--username=${db_username}"/>
 			<arg value="--password=${db_password}"/>
-			<arg value="--service=${service_name}"/>
+			<arg value="--service=${server_ip_address}/${db_service}"/>
 			<arg value="--goldusername=${db_username}"/>
 			<arg value="--loginusername=${db_username}"/>
 			<arg value="--createnewcluster"/>
@@ -353,7 +356,7 @@
 			<arg value="database_update.pl"/>
 			<arg value="--username=${db_username}"/>
 			<arg value="--password=${db_password}"/>
-			<arg value="--service=${service_name}"/>
+			<arg value="--service=${server_ip_address}/${db_service}"/>
 			<arg value="--goldusername=${db_username}"/>
 			<arg value="--loginusername=${db_username}"/> 
 			<arg value="--drop"/>
