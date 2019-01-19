@@ -25,7 +25,7 @@ When the GIT repository has been cloned successfully, open the swg-main director
 First and foremost, you'll need to install Apache ANT (at least version 1.9) on your VM.  ANT is required for the build process to run successfully.  ANT
 will be included in the next VM build, but for now here are the steps to do so manually:
 
-1. Go to https://ant.apache.com/download and download the latest version of ANT (1.10 something as of this writing).
+1. Go to https://ant.apache.com/download and download the latest version of ANT (1.10.5 is latest as of this writing, but anything over 1.9.x should work fine).
 2. Expand the ANT package (.zip or .tar) into your VM (or server) directories somewhere.  Take note of the location where you expanded it.
 3. Edit your .profile and add a line that sets the location where you expanded it as ANT_HOME.
 4. While you're editing your profile, make sure that JAVA_HOME is set to the right spot too.  You can figure out where Java is installed by using the
