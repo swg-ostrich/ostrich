@@ -418,6 +418,7 @@
 			<arg value="SwgDatabaseServer"/>
 		</exec>
 		<exec executable="killall" dir="${basedir}">
+			<arg value="-9"/>
 			<arg value="SwgGameServer"/>
 		</exec>
 		<exec executable="killall" dir="${basedir}">
