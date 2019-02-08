@@ -1,4 +1,4 @@
-<project name="SWGBuild" default="init" basedir="/home/swg/swg-main">
+<project name="SWGBuild" default="init" basedir="/home/swg/swg-main" xmlns:if="ant:if" xmlns:unless="ant:unless">
 	<import file="git_targets.xml" />
 	<description>
 		This build file will build all aspects of the SWG Source Code.  Created by Cekis (cekisswg@gmail.com).
@@ -181,8 +181,8 @@
 	<target name="prepare_src_x86" depends="init,get_arch,set_compiler" description="prepare server code - Intel" if="compile.x86">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-			<env key="CC" value="${cc_compiler}"/>
-			<env key="CXX" value="${cxx_compiler}"/>
+			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
+			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
 			<env key="LDFLAGS" value="-L/usr/lib32"/>
 			<env key="CMAKE_PREFIX_PATH" value="/usr/lib32:/lib32:/usr/lib/i386-linux-gnu:/usr/include/i386-linux-gnu"/>
 			<arg value="-DCMAKE_C_FLAGS=-m32"/>
@@ -199,8 +199,8 @@
 	<target name="prepare_src" depends="init,get_arch,set_compiler" description="compile server code - non Intel" unless="compile.x86">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-			<env key="CC" value="${cc_compiler}"/>
-			<env key="CXX" value="${cxx_compiler}"/>
+			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
+			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
 			<arg value="${src}"/>
 		</exec>
