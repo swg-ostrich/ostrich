@@ -308,21 +308,21 @@
 	</target>
 	
 	<!-- Creates the Object Template CRC file -->
-	<target name="build_object_template_crc" description="creates the object template crc file">
+	<target name="build_object_template_crc" description="creates the object template crc file" depends="compile_tpf, compile_miff">
 		<exec executable="utils/build_object_template_crc_string_tables.py" dir="${basedir}">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
         </exec>
 	</target>
 	
 	<!-- Creates the Quest CRC file -->
-	<target name="build_quest_crc" description="creates the quest crc file">
+	<target name="build_quest_crc" description="creates the quest crc file" depends="compile_tab">
 		<exec executable="utils/build_quest_crc_string_tables.py" dir="${basedir}">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
         </exec>
 	</target>
 	
 	<!-- Creates SQL (insert statements) to get all the CRC Templates into the database -->
-	<target name="process_templates" description="generates sql from generated crc files" depends="compile_tab,build_object_template_crc,build_quest_crc">
+	<target name="process_templates" description="generates sql from generated crc files" depends="build_object_template_crc,build_quest_crc">
 		<exec executable="perl" dir="${basedir}/src/game/server/database/templates" input="${object_crc_file}" output="${templates_sql_file}">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 			<arg value="processTemplateList.pl"/>
@@ -351,10 +351,39 @@
 			<arg value="--createnewcluster"/>
 			<arg value="--packages"/>
         </exec>
+		<antcall target="add_new_cluster"/>
+		<antcall target="configure_limits"/>
+	</target>
+	
+	<target name="add_new_cluster" description="Adds the cluster name to the database" if="firstrun">
+		<sql classpath="${env.ORACLE_HOME}/lib/ojdbc8.jar"
+			 driver="oracle.jdbc.OracleDriver"
+			 url="jdbc:oracle:thin:@${ADDR4}:1521:${db_service}"
+			 userid="${db_username}"
+			 password="${db_password}">
+			insert into cluster_list (id, name, num_characters, address, secret, locked, not_recommended)
+			values ((select nvl(max(id)+1,1) from cluster_list), '${cluster_name}', 0, '${ADDR4}', 'N', 'N', 'N');
+		</sql>
+	</target>
+	
+	<target name="configure_limits" description="Defines the limits of the cluster and accounts in the database">
+		<sql classpath="${env.ORACLE_HOME}/lib/ojdbc8.jar"
+			 driver="oracle.jdbc.OracleDriver"
+			 url="jdbc:oracle:thin:@${ADDR4}:1521:${db_service}"
+			 userid="${db_username}"
+			 password="${db_password}">
+			update default_char_limits set account_limit = ${max_characters_per_account}, cluster_limit = ${max_characters_per_cluster};
+			update default_character_slots set num_slots = ${character_slots} where character_type_id = 1;
+		</sql>
 	</target>
 	
 	<!-- Target used to delete database tables - change properties file "firstrun" from "false" to "true" to enable execution -->
-	<target name="drop_database" description="completely wipes database data" if="firstrun">
+	<target name="drop_database" description="completely wipes database data">
+		<input message="All data WILL BE DELETED from SWG DB!!!  ARE YOU SURE YOU WANT TO DELETE?  Type the word DELETE if you do: " addproperty="do.delete"/>
+		<condition property="do.drop">
+		  <equals arg1="DELETE" arg2="${do.delete}"/>
+		</condition>
+		<fail unless="do.drop">Database Drop Aborted.</fail>
 		<replace file="build.properties" token="firstrun = true" value="firstrun = false"/>
 		<exec executable="perl" dir="${basedir}/src/game/server/database/build/linux">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
