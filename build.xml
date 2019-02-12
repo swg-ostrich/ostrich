@@ -3,6 +3,9 @@
 	<description>
 		This build file will build all aspects of the SWG Source Code.  Created by Cekis (cekisswg@gmail.com).
 	</description>
+	<!-- Get our host info -->
+	<hostinfo/>
+	
 	<!-- Property File -->
 	<property file = "build.properties"/>
 	
@@ -10,7 +13,7 @@
 	<property name="build" location="${basedir}/build"/>
 	
 	<!-- Database Service Name is derived to make it easier in the properties file -->
-	<property name="service_name" value="//${server_ip_address}/${db_service}"/>
+	<property name="service_name" value="//${ADDR4}/${db_service}"/>
 	
 	<!-- Setup Source Directories -->
 	<property name="exe" location="${basedir}/exe"/>
@@ -35,7 +38,7 @@
 	<property name="tools_home" location="${build}/bin"/>
 	<property name="bin_home" location="${exe}/linux/bin"/>
 	<property environment="env"/>
-	
+		
 	<!-- The init target handles the environment setup - not much to do but create directories -->
 	<target name="init">
 		<tstamp/>
@@ -47,6 +50,7 @@
 
 	<target name="echoprops">
 		<echoproperties/>
+		<echo>IP Address: ${ADDR4}</echo>
 	</target>
 	
 	<target name="swg" description="builds the entire SWG codebase for the first run" depends="clean,git_all_update,update_configs,create_database,compile">
@@ -65,7 +69,9 @@
 	<!-- Delete the DSRC Build folder -->
 	<target name="clean_dsrc">
 		<echo>Cleaning the DSRC directory.</echo>
-		<delete dir="${data}" verbose="false"/>
+		<delete includeemptydirs="true" removeNotFollowedSymlinks="true">
+			<fileset dir="${data}" includes="**/*" followsymlinks="false"/>
+		</delete>
 	</target>
 	
 	<!-- Delete the DSRC Build folder -->
@@ -134,9 +140,9 @@
 		<replace dir="${exe}" propertyFile="${basedir}/build.properties">
 			<include name="**/*.cfg"/>
 			<replacefilter token="CLUSTERNAME" property="cluster_name"/>
-			<replacefilter token="HOSTIP" property="server_ip_address"/>
+			<replacefilter token="HOSTIP" property="ADDR4"/>
 			<replacefilter token="DBUSERNAME" property="db_username"/>
-			<replacefilter token="DBSERVICE" value="//${server_ip_address}/${db_service}"/>
+			<replacefilter token="DBSERVICE" property="service_name"/>
 			<replacefilter token="DBPASSWORD" property="db_password"/>
 		</replace>
 	</target>
@@ -231,7 +237,7 @@
 	</target>
 	
 	<!-- Compiles all code necessary for server execution -->
-	<target name="compile" depends="compile_src,compile_java,compile_miff,compile_tpf,compile_tab">
+	<target name="compile" depends="compile_src,compile_java,compile_miff,compile_tab,compile_tpf,load_templates">
 	</target>
 	
 	<!-- Compiles all .mif files -->
@@ -298,7 +304,6 @@
 			<fileset dir="${basedir}" includes="${dsrc}/**/*.tpf"/>
 			<mapper type="glob" from="${dsrc}/*.tpf" to="${data}/*.iff"/>
 		</apply>
-		<antcall target="load_templates"/>
 		<antcall target="cleanup"/>
 	</target>
 	
@@ -317,7 +322,7 @@
 	</target>
 	
 	<!-- Creates SQL (insert statements) to get all the CRC Templates into the database -->
-	<target name="process_templates" description="generates sql from generated crc files" depends="build_object_template_crc,build_quest_crc">
+	<target name="process_templates" description="generates sql from generated crc files" depends="compile_tab,build_object_template_crc,build_quest_crc">
 		<exec executable="perl" dir="${basedir}/src/game/server/database/templates" input="${object_crc_file}" output="${templates_sql_file}">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 			<arg value="processTemplateList.pl"/>
@@ -327,7 +332,7 @@
 	<!-- Executes the generated Template CRC SQL in SQL*Plus -->
 	<target name="load_templates" description="loads generated templates into the database" depends="process_templates">
 		<exec executable="sqlplus" dir="${build}">
-			<arg value="${db_username}/${db_password}@${server_ip_address}/${db_service}"/>
+			<arg value="${db_username}/${db_password}@${ADDR4}/${db_service}"/>
 			<arg value="@${templates_sql_file}"/>
         </exec>
 	</target>
@@ -340,7 +345,7 @@
 			<arg value="database_update.pl"/>
 			<arg value="--username=${db_username}"/>
 			<arg value="--password=${db_password}"/>
-			<arg value="--service=${server_ip_address}/${db_service}"/>
+			<arg value="--service=${ADDR4}/${db_service}"/>
 			<arg value="--goldusername=${db_username}"/>
 			<arg value="--loginusername=${db_username}"/>
 			<arg value="--createnewcluster"/>
@@ -349,14 +354,14 @@
 	</target>
 	
 	<!-- Target used to delete database tables - change properties file "firstrun" from "false" to "true" to enable execution -->
-	<target name="drop_database" description="creates database tables from existing sql scripts" if="firstrun">
+	<target name="drop_database" description="completely wipes database data" if="firstrun">
 		<replace file="build.properties" token="firstrun = true" value="firstrun = false"/>
 		<exec executable="perl" dir="${basedir}/src/game/server/database/build/linux">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 			<arg value="database_update.pl"/>
 			<arg value="--username=${db_username}"/>
 			<arg value="--password=${db_password}"/>
-			<arg value="--service=${server_ip_address}/${db_service}"/>
+			<arg value="--service=${ADDR4}/${db_service}"/>
 			<arg value="--goldusername=${db_username}"/>
 			<arg value="--loginusername=${db_username}"/> 
 			<arg value="--drop"/>
@@ -364,7 +369,7 @@
         </exec>
 	</target>
 	
-	<target name="create_symlinks" if="firstrun">
+	<target name="create_symlinks">
 		<symlink link="${basedir}/data/sku.0/sys.client/compiled/clientdata" resource="${clientdata}"/>
 		<symlink link="${basedir}/exe/linux/bin" resource="${tools_home}"/>
 	</target>
