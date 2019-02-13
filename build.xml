@@ -140,7 +140,7 @@
 		<replace dir="${exe}" propertyFile="${basedir}/build.properties">
 			<include name="**/*.cfg"/>
 			<replacefilter token="CLUSTERNAME" property="cluster_name"/>
-			<replacefilter token="HOSTIP" property="ADDR4"/>
+			<replacefilter token="HOSTIP" value="${ADDR4}"/>
 			<replacefilter token="DBUSERNAME" property="db_username"/>
 			<replacefilter token="DBSERVICE" property="service_name"/>
 			<replacefilter token="DBPASSWORD" property="db_password"/>
