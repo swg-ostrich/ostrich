@@ -12,3 +12,4 @@ miff/
 stationapi/build/
 stationapi/externals/
 .setup
+local.properties
