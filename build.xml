@@ -230,7 +230,6 @@
 			<arg value="-j${nproc}"/>
 		</exec>
 	</target>
-<<<<<<< HEAD
 	
 	<!-- Prepares the Station API (chat server) code for building -->
 	<target name="prepare_chat" description="prepares the chat server structure for building">
@@ -252,9 +251,6 @@
 		</exec>
 	</target>
 	
-=======
-
->>>>>>> 5f452c7817a59c4b6d6a221da4e8fe85e9b50ff6
 	<!-- Compiles the DSRC (Java) code -->
 	<target name="compile_java" depends="init" description="compile java code">
 		<javac srcdir="${dsrc_server}" destdir="${data_server}" includeantruntime="false" classpath="${data_server}" encoding="utf8" sourcepath="${dsrc_server}" debug="true" deprecation="on">
@@ -333,9 +329,9 @@
 		</apply>
 		<antcall target="cleanup"/>
 	</target>
-<<<<<<< HEAD
 	
 	<!-- Compiles all Template Definition Files (.tdf) -->
+	<!--
 	<target name="compile_tdf" description="compile the template definition files (*.tdf) into .iff">
 		<touch mkdirs="true" verbose="false">
 			<fileset dir="${dsrc}" includes="**/*.tdf"/>
@@ -353,22 +349,19 @@
 		</apply>
 		<antcall target="cleanup"/>
 	</target>
-	
-=======
-
->>>>>>> 5f452c7817a59c4b6d6a221da4e8fe85e9b50ff6
+	-->
 	<!-- Creates the Object Template CRC file -->
 	<target name="build_object_template_crc" description="creates the object template crc file" depends="compile_tpf, compile_miff">
 		<exec executable="utils/build_object_template_crc_string_tables.py" dir="${basedir}">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-        </exec>
+		</exec>
 	</target>
 
 	<!-- Creates the Quest CRC file -->
 	<target name="build_quest_crc" description="creates the quest crc file" depends="compile_tab">
 		<exec executable="utils/build_quest_crc_string_tables.py" dir="${basedir}">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-        </exec>
+		</exec>
 	</target>
 
 	<!-- Creates SQL (insert statements) to get all the CRC Templates into the database -->
@@ -376,7 +369,7 @@
 		<exec executable="perl" dir="${basedir}/src/game/server/database/templates" input="${object_crc_file}" output="${templates_sql_file}">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 			<arg value="processTemplateList.pl"/>
-        </exec>
+		</exec>
 	</target>
 
 	<!-- Executes the generated Template CRC SQL in SQL*Plus -->
@@ -384,7 +377,7 @@
 		<exec executable="sqlplus" dir="${build}">
 			<arg value="${db_username}/${db_password}@${ADDR4}/${db_service}"/>
 			<arg value="@${templates_sql_file}"/>
-        </exec>
+		</exec>
 	</target>
 
 	<!-- Target used to create database tables -->
@@ -400,7 +393,7 @@
 			<arg value="--loginusername=${db_username}"/>
 			<arg value="--createnewcluster"/>
 			<arg value="--packages"/>
-        </exec>
+		</exec>
 		<antcall target="add_new_cluster"/>
 		<antcall target="configure_limits"/>
 	</target>
@@ -445,7 +438,7 @@
 			<arg value="--loginusername=${db_username}"/>
 			<arg value="--drop"/>
 			<arg value="--packages"/>
-        </exec>
+		</exec>
 	</target>
 
 	<target name="create_symlinks">
