@@ -249,6 +249,9 @@
 			<arg value="--build"/>
 			<arg value="."/>
 		</exec>
+		<move todir="${basedir}/chat">
+			<fileset dir="${chat_build}/bin"/>
+		</move>
 	</target>
 	
 	<!-- Compiles the DSRC (Java) code -->
