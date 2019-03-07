@@ -405,7 +405,8 @@
 			 userid="${db_username}"
 			 password="${db_password}">
 			insert into cluster_list (id, name, num_characters, address, secret, locked, not_recommended)
-			values ((select nvl(max(id)+1,1) from cluster_list), '${cluster_name}', 0, '${ADDR4}', 'N', 'N', 'N');
+			select (select nvl(max(id)+1,1) from cluster_list), '${cluster_name}', 0, '${ADDR4}', 'N', 'N', 'N' from dual
+			where not exists (select '${cluster_name}', '${ADDR4}' from cluster_list);
 		</sql>
 	</target>
 
