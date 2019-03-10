@@ -56,7 +56,7 @@
 		<echo>IP Address: ${ADDR4}</echo>
 	</target>
 
-	<target name="swg" description="builds the entire SWG codebase for the first run" depends="clean,git_all_update,update_configs,create_database,compile">
+	<target name="swg" description="builds the entire SWG codebase for the first run" depends="clean,update_configs,create_database,compile">
 	</target>
 
 	<!-- Clean simply calls the other clean targets -->
@@ -66,13 +66,13 @@
 	<!-- Delete the SRC Build folder -->
 	<target name="clean_src">
 		<echo>Cleaning the SRC build directory.</echo>
-		<delete dir="${build}" verbose="false"/>
+		<delete dir="${build}" verbose="false" failonerror="false"/>
 	</target>
 
 	<!-- Delete the DSRC Build folder -->
 	<target name="clean_dsrc">
 		<echo>Cleaning the DSRC directory.</echo>
-		<delete includeemptydirs="true" removeNotFollowedSymlinks="true">
+		<delete includeemptydirs="true" removeNotFollowedSymlinks="true" failonerror="false">
 			<fileset dir="${data}" includes="**/*" followsymlinks="false"/>
 		</delete>
 	</target>
