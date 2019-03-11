@@ -110,6 +110,18 @@
 		</if>
     </sequential>
   </macrodef>
+	<macrodef name = "git-update-submods">
+	  <attribute name = "dir" default = "" />
+	  <sequential>
+	    <git command = "submodule" dir="@{dir}">
+			<args>
+				<arg line="update"/>
+				<arg line="--init"/>
+				<arg line="--recursive"/>
+			</args>
+		</git>
+	  </sequential>
+	</macrodef>
 
 <!--
 	<target name="git_tag">
