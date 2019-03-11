@@ -3,7 +3,6 @@ chat/
 configs/
 data/
 dependencies/
-exe/
 miff/
 .setup
 local.properties

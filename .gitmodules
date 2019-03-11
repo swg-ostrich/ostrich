@@ -10,3 +10,6 @@
 [submodule "clientdata"]
 	path = clientdata
 	url = https://github.com/SWG-Source/clientdata.git
+[submodule "exe"]
+	path = exe
+	url = https://github.com/SWG-Source/configs.git
