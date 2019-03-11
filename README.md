@@ -22,7 +22,7 @@ When the GIT repository has been cloned successfully, open the swg-main director
 - Java 8 (1.8_u101)
 - Apache ANT 1.9+
 
-First and foremost, you'll need to install Apache ANT (at least version 1.9) on your VM.  ANT is required for the build process to run successfully.  ANT
+First and foremost, IF YOU DO NOT HAVE ANT INSTALLED ALREADY, you'll need to install Apache ANT (at least version 1.9) on your VM.  ANT is required for the build process to run successfully.  ANT
 will be included in the next VM build, but for now here are the steps to do so manually:
 
 1. Go to https://ant.apache.com/download and download the latest version of ANT (1.10.5 is latest as of this writing, but anything over 1.9.x should work fine).
@@ -41,16 +41,7 @@ would like to run.  For starters, just don't worry about touching it.
 
 You can also run sections of the build script manually (not recommended until you are used to the environment of which you're working in).
 
-#### Cloning the Repositories
-A very useful command is ```ant git_all_update```.  It will attempt to get (or update if you already have them there) the pre-configured repositories that are
-outlined in the build script by cloning them or updating them (if they already exist).  It will simply do a pull if the repositories that already exist to bring
-them up to date.  This currently includes "src", "dsrc", and others:
-
-```
-ant git_src
-ant git_dsrc
-ant git_configs
-```
+#### ANT Usage
 DID YOU KNOW?: You can specify multiple ANT targets with a single command as well (this goes for any of these targets you give it).  ANT will execute them and make sure all
 of their dependencies are met in the order you provide them:
 
