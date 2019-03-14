@@ -122,6 +122,10 @@
 	
 	<target name="git_update_submods" description="Pull down the sub-modules for swg-main">
 		<git-update-submods dir="${basedir}"/>
+		<git-checkout branch="${src_branch}" dir="${src}"/>
+		<git-checkout branch="${dsrc_branch}" dir="${dsrc}"/>
+		<git-checkout branch="${configs_branch}" dir="${basedir}/exe"/>
+		<git-checkout branch="${clientdata_branch}" dir="${clientdata}"/>
 	</target>
 
 	<target name="update_configs" description="updates the configuration files with the desired settings" if="firstrun" depends="git_update_submods">
