@@ -128,7 +128,7 @@
 		<git-checkout branch="${clientdata_branch}" dir="${clientdata}"/>
 	</target>
 
-	<target name="update_configs" description="updates the configuration files with the desired settings" if="firstrun" depends="git_update_submods">
+	<target name="update_configs" description="updates the configuration files with the desired settings" if="firstrun">
 		<replace dir="${exe}" propertyFile="${basedir}/build.properties">
 			<include name="**/*.cfg"/>
 			<replacefilter token="CLUSTERNAME" property="cluster_name"/>
@@ -176,7 +176,7 @@
 	</target>
 
 	<!-- Compiles the SRC (C++) code -->
-	<target name="compile_src" description="compile server code" depends="init,prepare_src,prepare_src_x86,get_num_procs,strip_src,git_update_submods">
+	<target name="compile_src" description="compile server code" depends="init,prepare_src,prepare_src_x86,get_num_procs,strip_src">
 		<exec executable="make" dir="${build}" failonerror="true">
 			<env key="CC" value="${cc_compiler}"/>
 			<env key="CXX" value="${cxx_compiler}"/>
@@ -185,7 +185,7 @@
 	</target>
 	
 	<!-- Prepares the Station API (chat server) code for building -->
-	<target name="prepare_chat" description="prepares the chat server structure for building" depends="git_update_submods">
+	<target name="prepare_chat" description="prepares the chat server structure for building">
 		<copy todir="${chat_home}/externals/udplibrary">
 			<fileset dir="${chat_home}/udplibrary"/>
 		</copy>
@@ -208,7 +208,7 @@
 	</target>
 	
 	<!-- Compiles the DSRC (Java) code -->
-	<target name="compile_java" depends="init,git_update_submods" description="compile java code">
+	<target name="compile_java" depends="init" description="compile java code">
 		<javac srcdir="${dsrc_server}" destdir="${data_server}" includeantruntime="false" classpath="${data_server}" encoding="utf8" sourcepath="${dsrc_server}" debug="true" deprecation="on">
 			<compilerarg value="-Xlint:-options"/>
 		</javac>
@@ -216,7 +216,7 @@
 	</target>
 
 	<!-- Compiles all code necessary for server execution -->
-	<target name="compile" depends="git_update_submods,compile_src,compile_chat,compile_java,compile_miff,compile_tab,compile_tpf,load_templates">
+	<target name="compile" depends="compile_src,compile_chat,compile_java,compile_miff,compile_tab,compile_tpf,load_templates">
 	</target>
 
 	<!-- Compiles all .mif files -->
