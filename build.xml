@@ -17,7 +17,6 @@
 	<property name="service_name" value="//${ADDR4}/${db_service}"/>
 
 	<!-- Setup Source Directories -->
-	<property name="exe" location="${basedir}/exe"/>
 	<property name="src" location="${basedir}/src"/>
 	<property name="dsrc" location="dsrc" relative="true" basedir="${basedir}"/>
 	<property name="data" location="data" relative="true" basedir="${basedir}"/>
@@ -26,7 +25,7 @@
 	<property name="clientdata" location="${basedir}/clientdata"/>
 	<property name="configs" location="configs" relative="true" basedir="${basedir}"/>
 	<property name="dependencies" location="dependencies" relative="true" basedir="${basedir}"/>
-	
+
 	<!-- Setup Key Game Directories -->
 	<property name="dsrc_server" location="${dsrc}/sku.0/sys.server/compiled/game"/>
 	<property name="dsrc_shared" location="${dsrc}/sku.0/sys.shared/compiled/game"/>
@@ -40,7 +39,7 @@
 
 	<!-- Define where most of our compiled tools will live -->
 	<property name="tools_home" location="${build}/bin"/>
-	<property name="bin_home" location="${exe}/linux/bin"/>
+	<property name="bin_home" location="${configs}/bin"/>
 	<property environment="env"/>
 
 	<!-- The init target handles the environment setup - not much to do but create directories -->
@@ -405,18 +404,18 @@
 
 	<target name="create_symlinks">
 		<symlink link="${basedir}/data/sku.0/sys.client/compiled/clientdata" resource="${clientdata}"/>
-		<symlink link="${basedir}/exe/linux/bin" resource="${tools_home}"/>
+		<symlink link="${configs}/bin" resource="${tools_home}"/>
 	</target>
 
 	<target name="start" description="starts the server" depends="create_symlinks,stop">
-		<exec executable="bin/LoginServer" dir="${exe}/linux">
+		<exec executable="bin/LoginServer" dir="${configs}/">
 			<arg value="--"/>
 			<arg value="@servercommon.cfg &amp;"/>
 		</exec>
-		<exec executable="sleep" dir="${exe}/linux">
+		<exec executable="sleep" dir="${configs}/">
 			<arg value="5"/>
 		</exec>
-		<exec executable="bin/TaskManager" dir="${exe}/linux">
+		<exec executable="bin/TaskManager" dir="${configs}">
 			<arg value="--"/>
 			<arg value="@servercommon.cfg"/>
 		</exec>
