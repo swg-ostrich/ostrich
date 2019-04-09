@@ -18,3 +18,6 @@
 	path = dependencies
 	url = https://github.com/SWG-Source/dependencies.git
 	ignore = dirty
+[submodule "configs/example"]
+	path = configs/example
+	url = https://github.com/SWG-Source/configs.git

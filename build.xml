@@ -125,14 +125,17 @@
 		<git-update-submods dir="${basedir}"/>
 		<git-checkout branch="${src_branch}" dir="${src}"/>
 		<git-checkout branch="${dsrc_branch}" dir="${dsrc}"/>
-		<git-checkout branch="${configs_branch}" dir="${basedir}/exe"/>
+		<git-checkout branch="${configs_branch}" dir="${configs}/example"/>
 		<git-checkout branch="${clientdata_branch}" dir="${clientdata}"/>
 		<git-checkout branch="${dependencies_branch}" dir="${dependencies}"/>
 	</target>
 
 	<target name="update_configs" description="updates the configuration files with the desired settings" if="firstrun">
-		<replace dir="${exe}" propertyFile="${basedir}/build.properties">
-			<include name="**/*.cfg"/>
+		<copy todir="${configs}/">
+			<fileset dir="${configs}/example"/>
+		</copy>
+		<replace dir="${configs}" propertyFile="${basedir}/build.properties">
+			<include name="./*.cfg"/>
 			<replacefilter token="CLUSTERNAME" property="cluster_name"/>
 			<replacefilter token="HOSTIP" value="${ADDR4}"/>
 			<replacefilter token="DBUSERNAME" property="db_username"/>

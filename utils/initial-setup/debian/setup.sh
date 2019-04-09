@@ -31,6 +31,9 @@ else
 	sudo apt-get remove libxml2-dev:amd64 libncurses-dev:amd64 zlib1g-dev:amd64
 fi
 
+# install dependencies for stationapi
+sudo apt-get install libboost-dev libboost-program-options-dev sqlite3 libsqlite3-dev
+
 # install cxmake from src to fix CXX17 problems
 cd /tmp
 wget http://www.cmake.org/files/v3.8/cmake-3.8.2.tar.gz && \
