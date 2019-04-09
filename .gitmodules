@@ -14,4 +14,7 @@
 	path = exe
 	url = https://github.com/SWG-Source/configs.git
 	ignore = dirty
-
+[submodule "dependencies"]
+	path = dependencies
+	url = https://github.com/SWG-Source/dependencies.git
+	ignore = dirty

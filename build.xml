@@ -25,7 +25,8 @@
 	<property name="chat_build" location="${chat_home}/build"/>
 	<property name="clientdata" location="${basedir}/clientdata"/>
 	<property name="configs" location="configs" relative="true" basedir="${basedir}"/>
-
+	<property name="dependencies" location="dependencies" relative="true" basedir="${basedir}"/>
+	
 	<!-- Setup Key Game Directories -->
 	<property name="dsrc_server" location="${dsrc}/sku.0/sys.server/compiled/game"/>
 	<property name="dsrc_shared" location="${dsrc}/sku.0/sys.shared/compiled/game"/>
@@ -126,6 +127,7 @@
 		<git-checkout branch="${dsrc_branch}" dir="${dsrc}"/>
 		<git-checkout branch="${configs_branch}" dir="${basedir}/exe"/>
 		<git-checkout branch="${clientdata_branch}" dir="${clientdata}"/>
+		<git-checkout branch="${dependencies_branch}" dir="${dependencies}"/>
 	</target>
 
 	<target name="update_configs" description="updates the configuration files with the desired settings" if="firstrun">
