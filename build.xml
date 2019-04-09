@@ -403,7 +403,7 @@
 	</target>
 
 	<target name="create_symlinks">
-		<symlink link="${basedir}/data/sku.0/sys.client/compiled/clientdata" resource="${clientdata}"/>
+		<symlink link="${basedir}/data/sku.0/sys.client/compiled/game" resource="${clientdata}"/>
 		<symlink link="${configs}/bin" resource="${tools_home}"/>
 	</target>
 
