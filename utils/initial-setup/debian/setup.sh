@@ -14,22 +14,29 @@ sudo apt-get remove --purge oracle-java* oracle-instant*
 # update
 sudo apt-get update
 
+# install base dependencies
 if [[ $arch == "i386" ]]; then
 	echo "Setting up 32 bit build env..."
 	sudo apt-get install build-essential zlib1g-dev libpcre3-dev cmake psmisc \
-		libboost-dev libxml2-dev libncurses5-dev flex bison git-core alien libaio1 python-ply bc libcurl4-gnutls-dev clang-3.9 -y
+		libboost-dev libxml2-dev libncurses5-dev flex bison git-core alien libaio1 \
+		python-ply bc libcurl4-gnutls-dev clang-3.9 ant curl -y
 else
 	echo "Setting up 64 bit build env..."
 	sudo apt-get install lib32z1 lib32ncurses5 g++-6-multilib gcc-6-multilib clang-3.9 zlib1g-dev:i386 libc6:i386 psmisc clang \
 		libc6-dev:i386 libc6-i686:i386 libgcc1:i386 linux-libc-dev:i386 \
 		zlib1g:i386 libpcre3-dev:i386 cmake libxml2-dev:i386 libncurses5-dev:i386 \
 		flex bison git-core alien libaio1:i386 python-ply bc libaio1 \
-		libboost-dev build-essential libc6-dbg:i386 libc6-dbg libcurl4-gnutls-dev:i386 -y
+		libboost-dev build-essential libc6-dbg:i386 libc6-dbg libcurl4-gnutls-dev:i386 ant curl -y
 
 	sudo apt-get remove libxml2-dev:amd64 libncurses-dev:amd64 zlib1g-dev:amd64
 fi
 
-cd ~/swg-main/dependencies
+# install git lfs
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+sudo apt install git-lfs -y
+
+cd $basedir/dependencies
+
 # install java
 tar -xvzf jdk-8u152-linux-i586.tar.gz
 sudo mv jdk1.8.0_152/ /opt
