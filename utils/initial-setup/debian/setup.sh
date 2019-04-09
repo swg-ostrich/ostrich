@@ -32,7 +32,7 @@ else
 fi
 
 # install dependencies for stationapi
-sudo apt-get install libboost-dev libboost-program-options-dev sqlite3 libsqlite3-dev
+sudo apt-get install libboost-dev libboost-program-options-dev sqlite3 libsqlite3-dev -y
 
 # install cxmake from src to fix CXX17 problems
 cd /tmp
