@@ -131,7 +131,7 @@
 
 	<target name="update_configs" description="updates the configuration files with the desired settings" if="firstrun">
 		<copy todir="${configs}/">
-			<fileset dir="${configs}/example"/>
+			<fileset dir="${configs}/example/${config_type}"/>
 		</copy>
 		<replace dir="${configs}" propertyFile="${basedir}/build.properties">
 			<include name="./*.cfg"/>
