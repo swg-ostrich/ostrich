@@ -113,14 +113,10 @@
 	<macrodef name = "git-update-submods">
 	  <attribute name = "dir" default = "" />
 	  <sequential>
-		<git command = "submodule" dir="@{dir}">
-			<args>
-				<arg line="init"/>
-			</args>
-		</git>
 	    <git command = "submodule" dir="@{dir}">
 			<args>
 				<arg line="update"/>
+				<arg line="--init"/>
 				<arg line="--recursive"/>
 			</args>
 		</git>
