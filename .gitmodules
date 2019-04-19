@@ -1,19 +1,19 @@
 [submodule "stationapi"]
 	path = stationapi
-	url = https://github.com/SWG-Source/stationapi.git
+	url = ../swg-stationapi.git
 [submodule "dsrc"]
 	path = dsrc
-	url = https://github.com/SWG-Source/dsrc.git
+	url = ../swg-dsrc.git
 [submodule "src"]
 	path = src
-	url = https://github.com/SWG-Source/src.git
+	url = ../swg-src.git
 [submodule "clientdata"]
 	path = clientdata
-	url = https://github.com/SWG-Source/clientdata.git
+	url = ../swg-clientdata.git
 [submodule "dependencies"]
 	path = dependencies
-	url = https://github.com/SWG-Source/dependencies.git
+	url = ../swg-dependencies.git
 	ignore = dirty
 [submodule "configs/example"]
 	path = configs/example
-	url = https://github.com/SWG-Source/configs.git
+	url = ../swg-configs.git
