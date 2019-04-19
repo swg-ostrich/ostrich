@@ -84,7 +84,6 @@ def writeToFile(contents, file):
 buildRspFileAnyways = False
 ignoredFiles = [
 	"data/sku.0/sys.client/compiled/game/appearance/",
-	"data/sku.0/sys.client/compiled/game/datatables/",
 	"ship_target_appearance.iff",
 	"README.md",
 	"LICENSE.md",
