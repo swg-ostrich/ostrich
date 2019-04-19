@@ -17,3 +17,6 @@
 [submodule "configs/example"]
 	path = configs/example
 	url = ../swg-configs.git
+[submodule "mods/sku.ostrich"]
+	path = mods/sku.ostrich
+	url = ../swg-sku.ostrich.git
