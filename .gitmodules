@@ -15,14 +15,14 @@
 	branch = new-pipeline
 [submodule "dependencies"]
 	path = dependencies
-	url = https://github.com/swg-ostrich/swg-dependencies.git
+	url = https://github.com/swg-ostrich/dependencies.git
 	branch = master
 	ignore = dirty
 [submodule "configs/example"]
 	path = configs/example
-	url = https://github.com/swg-ostrich/swg-configs.git
+	url = https://github.com/swg-ostrich/configs.git
 	branch = new-pipeline
 [submodule "mods/sku.ostrich"]
 	path = mods/sku.ostrich
-	url = https://github.com/swg-ostrich/swg-sku.ostrich.git
+	url = https://github.com/swg-ostrich/sku.ostrich.git
 	branch = master
