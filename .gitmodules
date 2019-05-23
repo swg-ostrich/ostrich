@@ -1,28 +1,28 @@
 [submodule "stationapi"]
 	path = stationapi
-	url = ../swg-stationapi.git
+	url = https://github.com/swg-ostrich/stationapi.git
 	branch = master
 [submodule "dsrc"]
 	path = dsrc
-	url = ../swg-dsrc.git
+	url = https://github.com/swg-ostrich/dsrc.git
 	branch = master
 [submodule "src"]
 	path = src
-	url = ../swg-src.git
+	url = https://github.com/swg-ostrich/src.git
 [submodule "clientdata"]
 	path = clientdata
-	url = ../swg-clientdata.git
+	url = https://github.com/swg-ostrich/clientdata.git
 	branch = new-pipeline
 [submodule "dependencies"]
 	path = dependencies
-	url = ../swg-dependencies.git
+	url = https://github.com/swg-ostrich/swg-dependencies.git
 	branch = master
 	ignore = dirty
 [submodule "configs/example"]
 	path = configs/example
-	url = ../swg-configs.git
+	url = https://github.com/swg-ostrich/swg-configs.git
 	branch = new-pipeline
 [submodule "mods/sku.ostrich"]
 	path = mods/sku.ostrich
-	url = ../swg-sku.ostrich.git
+	url = https://github.com/swg-ostrich/swg-sku.ostrich.git
 	branch = master
