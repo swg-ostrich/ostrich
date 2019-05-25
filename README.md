@@ -1,7 +1,12 @@
-# swg-main
-Forked from https://github.com/SWG-Source/swg-main
+# Introduction
 
-## Initial Setup
- 1. `cd ostrich`
- 2. `git submodule update --init --recursive`
- 3. `git submodule foreach -q --recursive 'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)'`
+a fork of swg source, setup and prepared for live servers, large communities, and rapid development. forked from https://github.com/SWG-Source/swg-main
+
+# Initial Setup
+
+### Cloning
+ 1. `git clone --recurse-submodules -j8 git://github.com/swg-ostrich/ostrich.git`
+ 2. `cd ostrich`
+
+### Debian
+1. See the [Debian README](/utils/initial-setup/debian/README.md)
