@@ -13,21 +13,27 @@
 	url = https://github.com/swg-ostrich/configs.git
 	branch = master
 	
-[submodule "dependencies"]
-	path = dependencies
-	url = https://github.com/swg-ostrich/dependencies.git
-	branch = master
-	
 [submodule "site"]
 	path = site
 	url = https://github.com/swg-ostrich/site.git
 	branch = master	
+	
 [submodule "content/sku.ostrich"]
 	path = content/sku.ostrich
 	url = https://github.com/swg-ostrich/sku.ostrich.git
+	branch = master	
+	
 [submodule "content/sku.0/dsrc"]
 	path = content/sku.0/dsrc
 	url = https://github.com/swg-ostrich/dsrc.git
+	branch = testing	
+	
 [submodule "content/sku.0/data/sys.client/compiled/game"]
 	path = content/sku.0/data/sys.client/compiled/game
 	url = https://github.com/swg-ostrich/clientdata.git
+	branch = master	
+	
+[submodule "utils/initial-setup/dependencies"]
+	path = utils/initial-setup/dependencies
+	url = https://github.com/swg-ostrich/dependencies.git
+	branch = master	
