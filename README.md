@@ -5,7 +5,7 @@ a fork of swg source, setup and prepared for live servers, large communities, an
 # Initial Setup
 
 ### Cloning
- 1. `git clone --recurse-submodules -j8 git://github.com/swg-ostrich/ostrich.git`
+ 1. `git clone --recurse-submodules -j8 https://github.com/swg-ostrich/ostrich.git`
  2. `cd ostrich`
 
 ### Debian
