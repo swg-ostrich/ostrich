@@ -14,11 +14,9 @@
 	<property file="local.properties" />
 	<property file="build.properties" />
 
-	<!-- Global Properties -->
-	<property name="build" location="${basedir}/build"/>
-
 	<!-- Setup Source Directories -->
 	<property name="src" location="${basedir}/src"/>
+	<property name="build" location="${src}/build"/>
 	<property name="dsrc" location="dsrc" relative="true" basedir="${basedir}"/>
 	<property name="data" location="data" relative="true" basedir="${basedir}"/>
 	<property name="chat_home" location="${basedir}/stationapi"/>
@@ -123,11 +121,18 @@
 	
 	<target name="git_update_submods" description="Pull down the sub-modules for swg-main">
 		<git-update-submods dir="${basedir}"/>
+		<!-- Checkout branches from config -->
 		<git-checkout branch="${src_branch}" dir="${src}"/>
 		<git-checkout branch="${dsrc_branch}" dir="${dsrc}"/>
 		<git-checkout branch="${configs_branch}" dir="${configs}/example"/>
 		<git-checkout branch="${clientdata_branch}" dir="${clientdata}"/>
 		<git-checkout branch="${dependencies_branch}" dir="${dependencies}"/>
+		<!-- Pull latest changes from remote -->
+		<git-pull branch="${src_branch}" dir="${src}"/>
+		<git-pull branch="${dsrc_branch}" dir="${dsrc}"/>
+		<git-pull branch="${configs_branch}" dir="${configs}/example"/>
+		<git-pull branch="${clientdata_branch}" dir="${clientdata}"/>
+		<git-pull branch="${dependencies_branch}" dir="${dependencies}"/>
 	</target>
 
 	<target name="update_configs" description="updates the configuration files with the desired settings" if="firstrun">
@@ -207,9 +212,6 @@
 			<arg value="--build"/>
 			<arg value="."/>
 		</exec>
-		<move todir="${basedir}/chat">
-			<fileset dir="${chat_build}/bin"/>
-		</move>
 	</target>
 	
 	<!-- Compiles the DSRC (Java) code -->
