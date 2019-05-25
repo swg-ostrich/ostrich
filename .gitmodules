@@ -22,19 +22,12 @@
 	path = site
 	url = https://github.com/swg-ostrich/site.git
 	branch = master	
-
-[submodule "mods/sku.ostrich"]
-	path = mods/sku.ostrich
+[submodule "content/sku.ostrich"]
+	path = content/sku.ostrich
 	url = https://github.com/swg-ostrich/sku.ostrich.git
-	branch = master
-	
-[submodule "mods/sku.0/dsrc"]
-	path = mods/sku.0/dsrc
+[submodule "content/sku.0/dsrc"]
+	path = content/sku.0/dsrc
 	url = https://github.com/swg-ostrich/dsrc.git
-	branch = testing
-	
-[submodule "mods/sku.0/data/sys.client/compiled/game"]
-	path = mods/sku.0/data/sys.client/compiled/game
+[submodule "content/sku.0/data/sys.client/compiled/game"]
+	path = content/sku.0/data/sys.client/compiled/game
 	url = https://github.com/swg-ostrich/clientdata.git
-	branch = master
-	
