@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd exe/linux
+cd configs
 
 export LLVM_PROFILE_FILE="output-%p.profraw"
 
