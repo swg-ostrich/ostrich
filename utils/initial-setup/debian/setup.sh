@@ -47,7 +47,7 @@ curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.s
 sudo apt install git-lfs -y
 
 # prepare to install external dependencies
-cd $basedir
+cd $basedir/utils/initial-setup
 rm -rf dependencies/
 git submodule update --init --recursive
 
