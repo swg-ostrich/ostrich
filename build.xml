@@ -3,18 +3,19 @@
 	<description>
 		This build file will build all aspects of the SWG Source Code.  Created by Cekis (cekisswg@gmail.com).
 	</description>
+	
 	<!-- Get our host info -->
 	<hostinfo/>
 
+	<!-- Extra properties -->
+	<property name="javac.max.memory" value="2024M" />
+	
 	<!-- Property File -->
 	<property file="local.properties" />
 	<property file="build.properties" />
 
 	<!-- Global Properties -->
 	<property name="build" location="${basedir}/build"/>
-
-	<!-- Database Service Name is derived to make it easier in the properties file -->
-	<property name="service_name" value="//${ADDR4}/${db_service}"/>
 
 	<!-- Setup Source Directories -->
 	<property name="src" location="${basedir}/src"/>
@@ -133,12 +134,12 @@
 		<copy todir="${configs}/">
 			<fileset dir="${configs}/example/${config_type}"/>
 		</copy>
-		<replace dir="${configs}" propertyFile="${basedir}/build.properties">
-			<include name="./*.cfg"/>
-			<replacefilter token="CLUSTERNAME" property="cluster_name"/>
+		<replace dir="${configs}" propertyFile="${basedir}/local.properties">
+			<include name="*.cfg"/>
 			<replacefilter token="HOSTIP" value="${ADDR4}"/>
+			<replacefilter token="DBSERVICE" property="db_service"/>
+			<replacefilter token="CLUSTERNAME" property="cluster_name"/>		
 			<replacefilter token="DBUSERNAME" property="db_username"/>
-			<replacefilter token="DBSERVICE" value="service_name"/>
 			<replacefilter token="DBPASSWORD" property="db_password"/>
 		</replace>
 	</target>
@@ -254,7 +255,6 @@
 			<fileset refid="miff_files"/>
 			<mapper type="glob" from="*.mif" to="*.iff"/>
 		</apply>
-		<antcall target="cleanup"/>
 	</target>
 
 	<!-- Compiles all .tab files -->
