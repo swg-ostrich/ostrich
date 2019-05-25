@@ -31,7 +31,7 @@
 [submodule "mods/sku.0/dsrc"]
 	path = mods/sku.0/dsrc
 	url = https://github.com/swg-ostrich/dsrc.git
-	branch = master
+	branch = testing
 	
 [submodule "mods/sku.0/data/sys.client/compiled/game"]
 	path = mods/sku.0/data/sys.client/compiled/game
