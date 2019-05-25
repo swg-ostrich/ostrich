@@ -13,7 +13,12 @@
 	path = src
 	url = https://github.com/swg-ostrich/src.git
 	branch = master
-	
+
+[submodule "site"]
+	path = site
+	url = https://github.com/swg-ostrich/site.git
+	branch = master	
+
 [submodule "clientdata"]
 	path = clientdata
 	url = https://github.com/swg-ostrich/clientdata.git
