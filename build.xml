@@ -1,4 +1,4 @@
-<project name="SWGBuild" default="echoprops" basedir="/home/swg/swg-main" xmlns:if="ant:if" xmlns:unless="ant:unless">
+<project name="SWGBuild" default="echoprops" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless">
 	<import file="git_targets.xml" />
 	<description>
 		This build file will build all aspects of the SWG Source Code.  Created by Cekis (cekisswg@gmail.com).
@@ -213,7 +213,19 @@
 	
 	<!-- Compiles the DSRC (Java) code -->
 	<target name="compile_java" depends="init" description="compile java code">
-		<javac srcdir="${dsrc_server}" destdir="${data_server}" includeantruntime="false" classpath="${data_server}" encoding="utf8" sourcepath="${dsrc_server}" debug="true" deprecation="on">
+		<javac
+			memoryInitialSize="512m"
+			memoryMaximumSize="512m"
+			fork="true" 
+			srcdir="${dsrc_server}" 
+			destdir="${data_server}" 
+			includeantruntime="false" 
+			classpath="${data_server}" 
+			encoding="utf8" 
+			sourcepath="${dsrc_server}" 
+			debug="true" 
+			deprecation="on"
+		>
 			<compilerarg value="-Xlint:-options"/>
 		</javac>
 		<antcall target="create_symlinks"/>
@@ -221,7 +233,7 @@
 
 	<!-- Compiles all code necessary for server execution -->
 	<target name="compile" depends="compile_src,compile_chat,compile_java,compile_miff,compile_tab,compile_tpf,load_templates">
-	</target>
+	</target> 
 
 	<!-- Compiles all .mif files -->
 	<target name="compile_miff">
@@ -403,8 +415,8 @@
 	</target>
 
 	<target name="create_symlinks">
-		<symlink link="${basedir}/data/sku.0/sys.client/compiled/game" resource="${clientdata}"/>
-		<symlink link="${configs}/bin" resource="${tools_home}"/>
+		<symlink link="${basedir}/data/sku.0/sys.client/compiled/game" resource="${clientdata}" overwrite="true"/>
+		<symlink link="${configs}/bin" resource="${tools_home}" overwrite="true"/>
 	</target>
 
 	<target name="start" description="starts the server" depends="create_symlinks,stop">

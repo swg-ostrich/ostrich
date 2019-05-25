@@ -48,8 +48,10 @@ sudo apt install git-lfs -y
 
 # prepare to install external dependencies
 cd $basedir
-ant git_update_submods
-cd $basedir/dependencies
+rm -rf dependencies/
+git submodule update --init --recursive
+
+cd dependencies
 cp * /tmp
 cd /tmp
 
