@@ -1,27 +1,16 @@
+[submodule "src"]
+	path = src
+	url = https://github.com/swg-ostrich/src.git
+	branch = master
 
 [submodule "stationapi"]
 	path = stationapi
 	url = https://github.com/swg-ostrich/stationapi.git
 	branch = master
 	
-[submodule "dsrc"]
-	path = dsrc
-	url = https://github.com/swg-ostrich/dsrc.git
-	branch = master
-	
-[submodule "src"]
-	path = src
-	url = https://github.com/swg-ostrich/src.git
-	branch = master
-
-[submodule "site"]
-	path = site
-	url = https://github.com/swg-ostrich/site.git
-	branch = master	
-
-[submodule "clientdata"]
-	path = clientdata
-	url = https://github.com/swg-ostrich/clientdata.git
+[submodule "configs"]
+	path = configs/example
+	url = https://github.com/swg-ostrich/configs.git
 	branch = master
 	
 [submodule "dependencies"]
@@ -29,12 +18,22 @@
 	url = https://github.com/swg-ostrich/dependencies.git
 	branch = master
 	
-[submodule "configs/example"]
-	path = configs/example
-	url = https://github.com/swg-ostrich/configs.git
+[submodule "site"]
+	path = site
+	url = https://github.com/swg-ostrich/site.git
+	branch = master	
+
+[submodule "clientdata"]
+	path = mods/sku.0/data/sys.client/compiled/game
+	url = https://github.com/swg-ostrich/clientdata.git
 	branch = master
-	
-[submodule "mods/sku.ostrich"]
+
+[submodule "dsrc"]
+	path = mods/sku.0/dsrc
+	url = https://github.com/swg-ostrich/dsrc.git
+	branch = master
+
+[submodule "sku.ostrich"]
 	path = mods/sku.ostrich
 	url = https://github.com/swg-ostrich/sku.ostrich.git
 	branch = master
