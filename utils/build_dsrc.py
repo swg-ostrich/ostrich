@@ -17,135 +17,178 @@ failedTasks = []
 lastTickStatus = lambda: None
 
 def displayQueueStatus():
-	while q.qsize() > 0:
-		completedTasks = totalTaskCount - q.qsize()
-		progressPercent = (float(completedTasks) / float(totalTaskCount)) * 100.0
-		
-		# get stats between last tick
-		tasksCompletedSinceLastTick = completedTasks - lastTickStatus.completedTasks
-		timeSinceLastTick = time.time() - lastTickStatus.time
-		
-		# calculate eta
-		speed = float(tasksCompletedSinceLastTick) / float(timeSinceLastTick)
-		eta = float(q.qsize()) / max(speed, 1)
-		
-		# update tick object
-		if timeSinceLastTick >= lastTickSampleRate:
-			lastTickStatus.completedTasks = completedTasks
-			lastTickStatus.time = time.time()
+    while q.qsize() > 0:
+        completedTasks = totalTaskCount - q.qsize()
+        progressPercent = (float(completedTasks) / float(totalTaskCount)) * 100.0
 
-		# print current progress
-		print '\x1b[2K\r', "Progress: %.2f%% [%d / %d] ETA %s (%d tasks/second)" % (progressPercent , completedTasks, totalTaskCount, str(datetime.timedelta(seconds=eta)).split(".")[0], speed),
-		sys.stdout.flush()
-		time.sleep(1)
-	q.join()
+        # get stats between last tick
+        tasksCompletedSinceLastTick = completedTasks - lastTickStatus.completedTasks
+        timeSinceLastTick = time.time() - lastTickStatus.time
+
+        # calculate eta
+        speed = float(tasksCompletedSinceLastTick) / float(timeSinceLastTick)
+        eta = float(q.qsize()) / max(speed, 1)
+
+        # update tick object
+        if timeSinceLastTick >= lastTickSampleRate:
+            lastTickStatus.completedTasks = completedTasks
+            lastTickStatus.time = time.time()
+
+        # print current progress
+        print '\x1b[2K\r', "Progress: %.2f%% [%d / %d] ETA %s (%d tasks/second)" % (progressPercent , completedTasks, totalTaskCount, str(datetime.timedelta(seconds=eta)).split(".")[0], speed),
+        sys.stdout.flush()
+        time.sleep(1)
+    q.join()
 
 def processTask( task ):
-	toolCmd = task[0]
-	srcFile = task[1]
-	dstFile = task[2]
+    toolCmd = task[0]
+    srcFile = task[1]
+    dstFile = task[2]
+    toolCwd = task[3]
 
-	if srcFile in completedFiles:
-		return
+    if srcFile in completedFiles:
+        return
 
-	# remove dst file so we can validate successful creation
-	if os.path.isfile(dstFile):
-		os.remove(dstFile)
+    # remove dst file so we can validate successful creation
+    if os.path.isfile(dstFile):
+        os.remove(dstFile)
 
-	# run the tool
-	cmd = toolCmd.replace("$srcFile", srcFile)
+    # run the tool
+    srcFile = srcFile.replace(toolCwd, "./")
+    cmd = toolCmd.replace("$srcFile", srcFile)
 
-	# make sure destination folder exists
-	dstFolder = os.path.dirname(dstFile)
-	try:
-		if not os.path.exists(dstFolder):
-			os.makedirs(dstFolder)
-	except:
-		pass
+    # make sure destination folder exists
+    dstFolder = os.path.dirname(dstFile)
+    try:
+        if not os.path.exists(dstFolder):
+            os.makedirs(dstFolder)
+    except:
+        pass
 
-	if displayCmdOutput:
-		retcode = subprocess.call(cmd, shell=True, stderr=subprocess.STDOUT)
-	else:
-		FNULL = open(os.devnull, 'w')
-		retcode = subprocess.call(cmd, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+    if displayCmdOutput:
+        print "> [%s] %s" % (toolCwd, cmd)
+        retcode = subprocess.call(cmd, shell=True, cwd=toolCwd, stderr=subprocess.STDOUT)
+    else:
+        FNULL = open(os.devnull, 'w')
+        retcode = subprocess.call(cmd, shell=True, cwd=toolCwd, stdout=FNULL, stderr=subprocess.STDOUT)
 
-	# validate dst file was successfully created and no errorcode
-	if os.path.isfile(dstFile) is False or retcode is not 0:
-		failedTasks.append(task)
-	else:
-		global completedFileCount
-		completedFileCount += 1
+    # validate dst file was successfully created and no errorcode
+    if os.path.isfile(dstFile) is False or retcode is not 0:
+        failedTasks.append(task)
+    else:
+        global completedFileCount
+        completedFileCount += 1
 
-	completedFiles.append(srcFile)
+    completedFiles.append(srcFile)
 
 def queueWorker():
-	while True:
-		task = q.get()
-		processTask(task)
-		q.task_done()
+    while True:
+        task = q.get()
+        processTask(task)
+        q.task_done()
 
 
 def startQueueWorkers():
-	for i in range(numberOfWorkerThreads):
-		t = threading.Thread(target=queueWorker)
-		t.daemon = True
-		t.start()
+    for i in range(numberOfWorkerThreads):
+        t = threading.Thread(target=queueWorker)
+        t.daemon = True
+        t.start()
 
-def walkAndCompareAndRun( src, dst, srcExt, dstExt, runCmd ):
-	for root, dirs, files in os.walk(src):
-		path = root.split(os.sep)
+def walkAndCompareAndRun( src, dst, srcExt, dstExt, runCmd, toolCwd ):
 
-		for f in files:
-			file = "%s/%s" % (root, f)
-			ext = os.path.splitext(file)[1]
+    for root, dirs, files in os.walk(toolCwd + src):
+        path = root.split(os.sep)
 
-			if ext == srcExt and not file in ignoredFiles:
-				dstFile = file.replace(src, dst).replace(srcExt, dstExt)
+        for f in files:
+            file = "%s/%s" % (root, f)
+            ext = os.path.splitext(file)[1]
 
-				if os.path.isfile(dstFile): 
-					srcStat = os.stat(file)
-					dstStat = os.stat(dstFile)
-					
-					if srcStat.st_mtime > dstStat.st_mtime or buildAllFiles:
-						print "FILE %s NEEDS TO BE REBUILT" % (file)
-						q.put([runCmd, file, dstFile])
+            if ext == srcExt and not file in ignoredFiles:
+                dstFile = file.replace(src, dst).replace(srcExt, dstExt)
 
-				else:
-					print "FILE %s NEEDS TO BE BUILT" % (file)
-					q.put([runCmd, file, dstFile])
+                if os.path.isfile(dstFile):
+                    srcStat = os.stat(file)
+                    dstStat = os.stat(dstFile)
+
+                    if srcStat.st_mtime > dstStat.st_mtime or buildAllFiles:
+                        print "FILE %s NEEDS TO BE REBUILT" % (file)
+                        q.put([runCmd, file, dstFile, toolCwd])
+
+                else:
+                    print "FILE %s NEEDS TO BE BUILT" % (file)
+                    q.put([runCmd, file, dstFile, toolCwd])
 
 # program settings
-numberOfWorkerThreads = 8  # number of concurrent builder threads
+numberOfWorkerThreads = 8   # number of concurrent builder threads
 lastTickSampleRate = 10     # sample rate in seconds, for eta/speed
 buildAllFiles = False       # enable to skip modification time comparison
-displayCmdOutput = False    # enable to display output of tools
+displayCmdOutput = True    # enable to display output of tools
 
 ignoredFiles = [
-	"./dsrc/sku.0/sys.shared/built/game/misc/quest_crc_string_table.tab",
-	"./dsrc/sku.0/sys.server/built/game/misc/object_template_crc_string_table.tab",
-	"./dsrc/sku.0/sys.client/built/game/misc/object_template_crc_string_table.tab"
+    "content/sku.0/dsrc/sys.shared/built/game/misc/quest_crc_string_table.tab",
+    "content/sku.0/dsrc/sys.server/built/game/misc/object_template_crc_string_table.tab",
+    "content/sku.0/dsrc/sys.client/built/game/misc/object_template_crc_string_table.tab"
 ]
 
+# Collect our content skus and prepare them to be built
+skus = next(os.walk('content'))[1]
+skus.sort()
+
+searchPath = "-- -s SharedFile "
+for sku in skus:
+
+    skuDataPath = os.path.abspath("content/%s/data/" % (sku))
+
+    try:
+        sysShared = "/sys.shared/compiled/game"
+        sysServer = "/sys.server/compiled/game"
+
+        if not os.path.exists(skuDataPath + sysShared): os.makedirs(skuDataPath + sysShared)
+        if not os.path.exists(skuDataPath + sysServer): os.makedirs(skuDataPath + sysServer)
+
+        dataPath = "../%s/data" % (sku)
+        searchPath += "searchPath10=%s%s " % (dataPath, sysShared)
+        searchPath += "searchPath10=%s%s " % (dataPath, sysServer)
+    except:
+        pass
+
+for sku in skus:
+    print "[*] Scanning sku: %s" % (sku)
+
+    skuPath = "content/%s/" % (sku)
+
+    # build datatables
+    walkAndCompareAndRun("dsrc/", "data/",
+                         ".tab", ".iff",
+                         "../../configs/bin/DataTableTool -i $srcFile " + searchPath,
+                         skuPath)
+
+    # build objects
+    walkAndCompareAndRun("dsrc/", "data/",
+                         ".tpf", ".iff",
+                         "../../configs/bin/TemplateCompiler -compile $srcFile " + searchPath,
+                         skuPath)
+
 # build datatables
-walkAndCompareAndRun( "./dsrc/sku.0/", 
-					  "./data/sku.0/", 
-					  ".tab", 
-					  ".iff", 
-					  "./configs/bin/DataTableTool -i $srcFile -- -s SharedFile searchPath10=data/sku.0/sys.shared/compiled/game searchPath10=data/sku.0/sys.server/compiled/game")
+#walkAndCompareAndRun( "./dsrc/sku.0/",
+#					  "./data/sku.0/",
+#					  ".tab",
+#					  ".iff",
+#					  "./configs/bin/DataTableTool -i $srcFile -- -s SharedFile searchPath10=data/sku.0/sys.shared/compiled/game searchPath10=data/sku.0/sys.server/compiled/game")
 
 # build objects
-walkAndCompareAndRun( "./dsrc/sku.0/", 
-					  "./data/sku.0/", 
-					  ".tpf", 
-					  ".iff", 
-					  "./configs/bin/TemplateCompiler -compile $srcFile")
+# walkAndCompareAndRun( "./dsrc/sku.0/",
+# 					  "./data/sku.0/",
+# 					  ".tpf",
+# 					  ".iff",
+# 					  "./configs/bin/TemplateCompiler -compile $srcFile")
 
 # build scripts
-walkAndCompareAndRun( "./dsrc/sku.0/sys.server/compiled/game/script", 
-					  "./data/sku.0/sys.server/compiled/game/script", 
-					  ".java", 
-					  ".class", 
-					  "javac -Xlint:-options -encoding utf8 -classpath data/sku.0/sys.server/compiled/game -d data/sku.0/sys.server/compiled/game -sourcepath dsrc/sku.0/sys.server/compiled/game -g -deprecation $srcFile")
+# walkAndCompareAndRun( "./dsrc/sku.0/sys.server/compiled/game/script",
+# 					  "./data/sku.0/sys.server/compiled/game/script",
+# 					  ".java",
+# 					  ".class",
+# 					  "javac -Xlint:-options -encoding utf8 -classpath data/sku.0/sys.server/compiled/game -d data/sku.0/sys.server/compiled/game -sourcepath dsrc/sku.0/sys.server/compiled/game -g -deprecation $srcFile")
 
 # prepare to start working
 totalTaskCount = q.qsize()
@@ -154,29 +197,29 @@ startQueueWorkers()
 
 start = time.time()
 lastTickStatus.completedTasks = 0
-lastTickStatus.time = start 
+lastTickStatus.time = start
 
 # start processing our queue of build tasks while there are tasks
 displayQueueStatus()
 
 # reprocess failed tasks incase it was the result of a dependency issue
 if len(failedTasks) > 0:
-	previousFailedTaskCount = len(failedTasks) + 1
+    previousFailedTaskCount = len(failedTasks) + 1
 
-	while previousFailedTaskCount > len(failedTasks):
-		previousFailedTaskCount = len(failedTasks)
-		failedTasksCopy = copy.deepcopy(failedTasks)
+    while previousFailedTaskCount > len(failedTasks):
+        previousFailedTaskCount = len(failedTasks)
+        failedTasksCopy = copy.deepcopy(failedTasks)
 
-		completedFiles = []
-		failedTasks = []
+        completedFiles = []
+        failedTasks = []
 
-		for task in failedTasksCopy:
-			q.put(task)
+        for task in failedTasksCopy:
+            q.put(task)
 
-		displayQueueStatus()
+        displayQueueStatus()
 
-	# no more files were built so prepare for final output
-	if len(failedTasks) == previousFailedTaskCount: print ""
+    # no more files were built so prepare for final output
+    if len(failedTasks) == previousFailedTaskCount: print ""
 
 
 # display our final results
