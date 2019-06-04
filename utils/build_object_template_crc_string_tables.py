@@ -24,9 +24,9 @@ def build_skus():
 	skus.sort()
 	
 	for sku in skus:
-		serverobjs.extend(read_objects('./content/%s/sys.server/compiled/game/object' % (sku)))
-		sharedobjs.extend(read_objects('./content/%s/sys.shared/compiled/game/object' % (sku)))
-		sharedobjs.extend(read_objects('./content/%s/sys.server/compiled/game/object/creature/player' % (sku)))
+		serverobjs.extend(read_objects('./content/%s/data/sys.server/compiled/game/object' % (sku)))
+		sharedobjs.extend(read_objects('./content/%s/data/sys.shared/compiled/game/object' % (sku)))
+		sharedobjs.extend(read_objects('./content/%s/data/sys.server/compiled/game/object/creature/player' % (sku)))
 		
 		allobjs.extend(serverobjs)
 		allobjs.extend(sharedobjs)
