@@ -37,7 +37,7 @@ def displayQueueStatus():
         # print current progress
         print '\x1b[2K\r', "Progress: %.2f%% [%d / %d] ETA %s (%d tasks/second)" % (progressPercent , completedTasks, totalTaskCount, str(datetime.timedelta(seconds=eta)).split(".")[0], speed),
         sys.stdout.flush()
-        time.sleep(1)
+        time.sleep(0.1)
     q.join()
 
 def processTask( task ):
@@ -87,7 +87,6 @@ def queueWorker():
         processTask(task)
         q.task_done()
 
-
 def startQueueWorkers():
     for i in range(numberOfWorkerThreads):
         t = threading.Thread(target=queueWorker)
@@ -122,7 +121,7 @@ def walkAndCompareAndRun( src, dst, srcExt, dstExt, runCmd, toolCwd ):
 numberOfWorkerThreads = 8   # number of concurrent builder threads
 lastTickSampleRate = 10     # sample rate in seconds, for eta/speed
 buildAllFiles = False       # enable to skip modification time comparison
-displayCmdOutput = True    # enable to display output of tools
+displayCmdOutput = False    # enable to display output of tools
 
 ignoredFiles = [
     "content/sku.0/dsrc/sys.shared/built/game/misc/quest_crc_string_table.tab",
@@ -134,23 +133,29 @@ ignoredFiles = [
 skus = next(os.walk('content'))[1]
 skus.sort()
 
-searchPath = "-- -s SharedFile "
-for sku in skus:
+# build javac classpath and sourcepath
+dataPaths = []
+dsrcPaths = []
 
-    skuDataPath = os.path.abspath("content/%s/data/" % (sku))
+for sku in skus:
+    skuPath = os.path.abspath("content/%s/" % (sku))
+
+    sysShared = "sys.shared/compiled/game"
+    sysServer = "sys.server/compiled/game"
+
+    skuDataPath = skuPath + "/data/"
+    skuDsrcPath = skuPath + "/dsrc/"
 
     try:
-        sysShared = "/sys.shared/compiled/game"
-        sysServer = "/sys.server/compiled/game"
-
         if not os.path.exists(skuDataPath + sysShared): os.makedirs(skuDataPath + sysShared)
         if not os.path.exists(skuDataPath + sysServer): os.makedirs(skuDataPath + sysServer)
-
-        dataPath = "../%s/data" % (sku)
-        searchPath += "searchPath10=%s%s " % (dataPath, sysShared)
-        searchPath += "searchPath10=%s%s " % (dataPath, sysServer)
     except:
         pass
+
+    dataPaths.append("%s%s" % (skuDataPath, sysServer))
+    dsrcPaths.append("%s%s" % (skuDsrcPath, sysServer))
+
+
 
 for sku in skus:
     print "[*] Scanning sku: %s" % (sku)
@@ -160,35 +165,30 @@ for sku in skus:
     # build datatables
     walkAndCompareAndRun("dsrc/", "data/",
                          ".tab", ".iff",
-                         "../../configs/bin/DataTableTool -i $srcFile " + searchPath,
+                         "../../configs/bin/DataTableTool -i $srcFile",
                          skuPath)
 
     # build objects
     walkAndCompareAndRun("dsrc/", "data/",
                          ".tpf", ".iff",
-                         "../../configs/bin/TemplateCompiler -compile $srcFile " + searchPath,
+                         "../../configs/bin/TemplateCompiler  -compile $srcFile",
                          skuPath)
 
-# build datatables
-#walkAndCompareAndRun( "./dsrc/sku.0/",
-#					  "./data/sku.0/",
-#					  ".tab",
-#					  ".iff",
-#					  "./configs/bin/DataTableTool -i $srcFile -- -s SharedFile searchPath10=data/sku.0/sys.shared/compiled/game searchPath10=data/sku.0/sys.server/compiled/game")
+    # build scripts
+    javaOutputPath = "data/sys.server/compiled/game"
+    javaClassPath = ":".join(dataPaths)
+    javaSourcePath = ":".join(dsrcPaths)
+    javaCommand = 'javac -Xlint:-options -encoding utf8 ' \
+                  '-classpath "%s" ' \
+                  '-d "%s" ' \
+                  '-sourcepath "%s" ' \
+                  '-g -deprecation $srcFile' \
+                  % (javaClassPath, javaOutputPath, javaSourcePath)
 
-# build objects
-# walkAndCompareAndRun( "./dsrc/sku.0/",
-# 					  "./data/sku.0/",
-# 					  ".tpf",
-# 					  ".iff",
-# 					  "./configs/bin/TemplateCompiler -compile $srcFile")
-
-# build scripts
-# walkAndCompareAndRun( "./dsrc/sku.0/sys.server/compiled/game/script",
-# 					  "./data/sku.0/sys.server/compiled/game/script",
-# 					  ".java",
-# 					  ".class",
-# 					  "javac -Xlint:-options -encoding utf8 -classpath data/sku.0/sys.server/compiled/game -d data/sku.0/sys.server/compiled/game -sourcepath dsrc/sku.0/sys.server/compiled/game -g -deprecation $srcFile")
+    walkAndCompareAndRun("dsrc/sys.server/compiled/game/script/",
+                         "data/sys.server/compiled/game/script/",
+                         ".java", ".class",
+                         javaCommand, skuPath)
 
 # prepare to start working
 totalTaskCount = q.qsize()
