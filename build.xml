@@ -213,126 +213,27 @@
 			<arg value="."/>
 		</exec>
 	</target>
-	
-	<!-- Compiles the DSRC (Java) code -->
-	<target name="compile_java" depends="init" description="compile java code">
-		<javac
-			memoryInitialSize="512m"
-			memoryMaximumSize="512m"
-			fork="true" 
-			srcdir="${dsrc_server}" 
-			destdir="${data_server}" 
-			includeantruntime="false" 
-			classpath="${data_server}" 
-			encoding="utf8" 
-			sourcepath="${dsrc_server}" 
-			debug="true" 
-			deprecation="on"
-		>
-			<compilerarg value="-Xlint:-options"/>
-		</javac>
-		<antcall target="create_symlinks"/>
-	</target>
 
 	<!-- Compiles all code necessary for server execution -->
-	<target name="compile" depends="compile_src,compile_chat,compile_java,compile_miff,compile_tab,compile_tpf,load_templates">
+	<target name="compile" depends="compile_src,compile_chat,build_dsrc,load_templates">
 	</target> 
 
-	<!-- Compiles all .mif files -->
-	<target name="compile_miff">
-		<fileset id="miff_files" dir="${dsrc}" includes="**/*.mif"/>
-		<touch mkdirs="true" verbose="false">
-		  <fileset refid="miff_files"/>
-		  <mapper type="glob" from="*.mif" to="${data}/*/.tmp" />
-		</touch>
-		<delete>
-		  <fileset dir="${data}" includes="**/.tmp"/>
-		</delete>
-		<apply executable="./Miff" dir="${tools_home}" dest="${data}" parallel="false" type="file">
+	<!-- Builds all of dsrc -->
+	<target name="build_dsrc" description="builds files in dsrc" depends="compile_src">
+		<exec executable="utils/build_dsrc.py" dir="${basedir}">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-			<arg value="-i"/>
-			<srcfile prefix="&quot;" suffix="&quot;"/>
-			<arg value="-o"/>
-			<targetfile prefix="&quot;" suffix="&quot;"/>
-			<fileset refid="miff_files"/>
-			<mapper type="glob" from="*.mif" to="*.iff"/>
-		</apply>
+		</exec>
 	</target>
 
-	<!-- Compiles all .tab files -->
-	<target name="compile_tab">
-		<property name="server_datatables" location="${dsrc_server}/datatables"/>
-		<property name="shared_datatables" location="${dsrc_shared}/datatables"/>
-		<property name="include_datatables" location="${shared_datatables}/include"/>
-		<touch mkdirs="true" verbose="false">
-			<fileset dir="${dsrc}" includes="**/*.tab"/>
-			<mapper type="glob" from="*.tab" to="${data}/*/.tmp" />
-		</touch>
-		<delete>
-			<fileset dir="${data}" includes="**/.tmp"/>
-		</delete>
-		<apply executable="./DataTableTool" dir="${tools_home}" dest="${data}" parallel="false" type="file" failonerror="true">
-			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-			<arg value="-i"/>
-			<srcfile prefix="&quot;" suffix="&quot;"/>
-			<arg value="-- -s SharedFile"/>
-			<arg value="searchPath10=${data_shared}"/>
-			<arg value="searchPath10=${data_server}"/>
-			<arg value="searchPath10=${data_server}"/>
-			<fileset dir="${dsrc}" includes="**/*.tab" excludes="**/object_template_crc_string_table.tab,**/quest_crc_string_table.tab"/>
-			<mapper type="glob" from="*.tab" to="*.iff"/>
-		</apply>
-		<antcall target="cleanup"/>
-	</target>
-
-	<!-- Compiles all Template Files (.tpf) -->
-	<target name="compile_tpf" description="compile the template files (*.tpf) into .iff">
-		<touch mkdirs="true" verbose="false">
-			<fileset dir="${dsrc}" includes="**/*.tpf"/>
-			<mapper type="glob" from="*.tpf" to="${data}/*/.tmp" />
-		</touch>
-		<delete>
-			<fileset dir="${data}" includes="**/.tmp"/>
-		</delete>
-		<apply executable="${tools_home}/TemplateCompiler" dir="${basedir}" dest="${basedir}" parallel="false" type="file" failonerror="false" relative="true">
-			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-			<arg value="-compile"/>
-			<srcfile/>
-			<fileset dir="${basedir}" includes="${dsrc}/**/*.tpf"/>
-			<mapper type="glob" from="${dsrc}/*.tpf" to="${data}/*.iff"/>
-		</apply>
-		<antcall target="cleanup"/>
-	</target>
-	
-	<!-- Compiles all Template Definition Files (.tdf) -->
-	<!--
-	<target name="compile_tdf" description="compile the template definition files (*.tdf) into .iff">
-		<touch mkdirs="true" verbose="false">
-			<fileset dir="${dsrc}" includes="**/*.tdf"/>
-			<mapper type="glob" from="*.tdf" to="${data}/*/.tmp" />
-		</touch>
-		<delete>
-			<fileset dir="${data}" includes="**/.tmp"/>
-		</delete>
-		<apply executable="${tools_home}/TemplateDefinitionCompiler" dir="${basedir}" dest="${basedir}" parallel="false" type="file" failonerror="false" relative="true">
-			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-			<arg value="-compile"/>
-			<srcfile/>
-			<fileset dir="${basedir}" includes="${dsrc}/**/*.tdf"/>
-			<mapper type="glob" from="${dsrc}/*.tdf" to="${data}/*.iff"/>
-		</apply>
-		<antcall target="cleanup"/>
-	</target>
-	-->
 	<!-- Creates the Object Template CRC file -->
-	<target name="build_object_template_crc" description="creates the object template crc file" depends="compile_tpf, compile_miff">
+	<target name="build_object_template_crc" description="creates the object template crc file" depends="build_dsrc">
 		<exec executable="utils/build_object_template_crc_string_tables.py" dir="${basedir}">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 		</exec>
 	</target>
 
 	<!-- Creates the Quest CRC file -->
-	<target name="build_quest_crc" description="creates the quest crc file" depends="compile_tab">
+	<target name="build_quest_crc" description="creates the quest crc file" depends="build_dsrc">
 		<exec executable="utils/build_quest_crc_string_tables.py" dir="${basedir}">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 		</exec>

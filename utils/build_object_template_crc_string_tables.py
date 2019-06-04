@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-
 from os import walk, path, makedirs
 from subprocess import PIPE, Popen
 
-serverdir = './data/sku.0/sys.server/compiled/game/object'
-shareddir = './data/sku.0/sys.shared/compiled/game/object'
+serverobjs = []
+sharedobjs = []
+allobjs = []
 
 def read_objects(objectdir):
 	files = []
@@ -19,9 +19,25 @@ def read_objects(objectdir):
 
 	return files
 
+def build_skus():
+	skus = next(walk('content'))[1]
+	skus.sort()
+	
+	for sku in skus:
+		serverobjs.extend(read_objects('./content/%s/sys.server/compiled/game/object' % (sku)))
+		sharedobjs.extend(read_objects('./content/%s/sys.shared/compiled/game/object' % (sku)))
+		sharedobjs.extend(read_objects('./content/%s/sys.server/compiled/game/object/creature/player' % (sku)))
+		
+		allobjs.extend(serverobjs)
+		allobjs.extend(sharedobjs)
+	
+	build_table('client', sharedobjs)
+	build_table('server', list(set(allobjs)))
+
+	
 def build_table(type, objs):
-	tabfile = "./dsrc/sku.0/sys.%s/built/game/misc/object_template_crc_string_table.tab" % (type)
-	ifffile = "./data/sku.0/sys.%s/built/game/misc/object_template_crc_string_table.iff" % (type)
+	tabfile = "./content/sku.0/dsrc/sys.%s/built/game/misc/object_template_crc_string_table.tab" % (type)
+	ifffile = "./content/sku.0/data/sys.%s/built/game/misc/object_template_crc_string_table.iff" % (type)
 
 	if not path.exists(path.dirname(tabfile)):
 		makedirs(path.dirname(tabfile))
@@ -38,17 +54,4 @@ def build_table(type, objs):
 
 	p.communicate()
 
-serverobjs = []
-sharedobjs = []
-allobjs = []
-
-serverobjs.extend(read_objects('./data/sku.0/sys.server/compiled/game/object'))
-sharedobjs.extend(read_objects('./data/sku.0/sys.shared/compiled/game/object'))
-sharedobjs.extend(read_objects('./data/sku.0/sys.server/compiled/game/object/creature/player'))
-
-build_table('client', sharedobjs)
-
-allobjs.extend(serverobjs)
-allobjs.extend(sharedobjs)
-
-build_table('server', list(set(allobjs)))
+build_skus()

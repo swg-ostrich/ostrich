@@ -17,16 +17,19 @@ def read_objects(objectdir):
 
 	return files
 
-questlistdir = './data/sku.0/sys.shared/compiled/game/datatables/questlist'
-
 allobjs = []
+	
+skus = next(walk('content'))[1]
+skus.sort()
 
-allobjs.extend(read_objects(questlistdir))
+for sku in skus:
+	questlistdir = './content/%s/data/sys.shared/compiled/game/datatables/questlist' % (sku)
+	allobjs.extend(read_objects(questlistdir))
 
 allobjs.sort()
 
-tabfile = './dsrc/sku.0/sys.shared/built/game/misc/quest_crc_string_table.tab'
-ifffile = './data/sku.0/sys.shared/built/game/misc/quest_crc_string_table.iff'
+tabfile = './content/sku.0/dsrc/sys.shared/built/game/misc/quest_crc_string_table.tab'
+ifffile = './content/sku.0/data/sys.shared/built/game/misc/quest_crc_string_table.iff'
 
 if not path.exists(path.dirname(tabfile)):
 	makedirs(path.dirname(tabfile))
