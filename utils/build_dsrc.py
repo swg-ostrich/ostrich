@@ -53,9 +53,9 @@ def processTask( task ):
     if os.path.isfile(dstFile):
         os.remove(dstFile)
 
-    # run the tool
-    srcFile = srcFile.replace(toolCwd, "./")
-    cmd = toolCmd.replace("$srcFile", srcFile)
+    # prepare tool run command
+    cmd = toolCmd.replace("$srcFile", srcFile).replace("$dstFile", dstFile)
+    cmd = cmd.replace(toolCwd, "./")
 
     # make sure destination folder exists
     dstFolder = os.path.dirname(dstFile)
@@ -65,6 +65,7 @@ def processTask( task ):
     except:
         pass
 
+	# run the tool
     if displayCmdOutput:
         print "> [%s] %s" % (toolCwd, cmd)
         retcode = subprocess.call(cmd, shell=True, cwd=toolCwd, stderr=subprocess.STDOUT)
@@ -171,7 +172,13 @@ for sku in skus:
     # build objects
     walkAndCompareAndRun("dsrc/", "data/",
                          ".tpf", ".iff",
-                         "../../configs/bin/TemplateCompiler  -compile $srcFile",
+                         "../../configs/bin/TemplateCompiler -compile $srcFile",
+                         skuPath)
+						 
+	# build miff
+    walkAndCompareAndRun("dsrc/", "data/",
+                         ".mif", ".iff",
+                         "../../configs/bin/Miff -i $srcFile -o $dstFile",
                          skuPath)
 
     # build scripts
