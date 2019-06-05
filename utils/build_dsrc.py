@@ -55,7 +55,7 @@ def processTask( task ):
 
     # prepare tool run command
     cmd = toolCmd.replace("$srcFile", srcFile).replace("$dstFile", dstFile)
-    cmd = cmd.replace(toolCwd, "./")
+    cmd = cmd.replace(toolCwd, "./", 1)
 
     # make sure destination folder exists
     dstFolder = os.path.dirname(dstFile)
@@ -74,7 +74,7 @@ def processTask( task ):
         retcode = subprocess.call(cmd, shell=True, cwd=toolCwd, stdout=FNULL, stderr=subprocess.STDOUT)
 
     # validate dst file was successfully created and no errorcode
-    if os.path.isfile(dstFile) is False or retcode is not 0:
+    if os.path.isfile(dstFile) is False or retcode is not 0 or os.stat(dstFile).st_size == 0:
         failedTasks.append(task)
     else:
         global completedFileCount
@@ -134,30 +134,66 @@ ignoredFiles = [
 skus = next(os.walk('content'))[1]
 skus.sort()
 
+# create the content.cfg so server can load data for the set of skus
+contentCfg = "content/content.cfg"
+with open(contentCfg, 'w') as cfg:
+	cfg.write("[SharedFile]\n")
+	for sku in skus:
+		skuPath = "content/%s/" % (sku)
+		
+		sharedCompiled = "data/sys.shared/compiled/game"
+		sharedBuilt = "data/sys.shared/built/game"
+		
+		serverCompiled = "data/sys.server/compiled/game"
+		serverBuilt = "data/sys.server/built/game"
+		
+		clientCompiled = "data/sys.client/compiled/game"
+		
+		if os.path.exists(skuPath + sharedCompiled):
+			cfg.write("searchPath2=../%s%s\n" % (skuPath, sharedCompiled))
+		
+		if os.path.exists(skuPath + sharedBuilt):
+			cfg.write("searchPath2=../%s%s\n" % (skuPath, sharedBuilt))
+		
+		if os.path.exists(skuPath + serverCompiled):
+			cfg.write("searchPath1=../%s%s\n" % (skuPath, serverCompiled))
+		
+		if os.path.exists(skuPath + serverBuilt):
+			cfg.write("searchPath1=../%s%s\n" % (skuPath, serverBuilt))
+		
+		if os.path.exists(skuPath + clientCompiled):
+			cfg.write("searchPath0=../%s%s\n" % (skuPath, clientCompiled))
+		
+	cfg.close()
+
 # build javac classpath and sourcepath
 dataPaths = []
 dsrcPaths = []
 
 for sku in skus:
-    skuPath = os.path.abspath("content/%s/" % (sku))
+    skuPath = os.path.abspath("./content/%s/" % (sku))
 
     sysShared = "sys.shared/compiled/game"
     sysServer = "sys.server/compiled/game"
 
     skuDataPath = skuPath + "/data/"
     skuDsrcPath = skuPath + "/dsrc/"
-
+	
     try:
         if not os.path.exists(skuDataPath + sysShared): os.makedirs(skuDataPath + sysShared)
         if not os.path.exists(skuDataPath + sysServer): os.makedirs(skuDataPath + sysServer)
     except:
         pass
 
+    dataPaths.append("%s%s" % (skuDataPath, sysShared))
     dataPaths.append("%s%s" % (skuDataPath, sysServer))
     dsrcPaths.append("%s%s" % (skuDsrcPath, sysServer))
 
+# prepare search path for SWG tools
+searchPath = "-- -s SharedFile"
+for path in dataPaths: searchPath += " searchPath10=" + path
 
-
+# build dsrc for each sku
 for sku in skus:
     print "[*] Scanning sku: %s" % (sku)
 
@@ -166,7 +202,7 @@ for sku in skus:
     # build datatables
     walkAndCompareAndRun("dsrc/", "data/",
                          ".tab", ".iff",
-                         "../../configs/bin/DataTableTool -i $srcFile",
+                         "../../configs/bin/DataTableTool -i $srcFile " + searchPath,
                          skuPath)
 
     # build objects
