@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Created by seefo 
+# Created by seefo
 import Queue as queue
 import os
 import os.path
@@ -65,7 +65,7 @@ def processTask( task ):
     except:
         pass
 
-	# run the tool
+    # run the tool
     if displayCmdOutput:
         print "> [%s] %s" % (toolCwd, cmd)
         retcode = subprocess.call(cmd, shell=True, cwd=toolCwd, stderr=subprocess.STDOUT)
@@ -137,34 +137,34 @@ skus.sort()
 # create the content.cfg so server can load data for the set of skus
 contentCfg = "content/content.cfg"
 with open(contentCfg, 'w') as cfg:
-	cfg.write("[SharedFile]\n")
-	for sku in skus:
-		skuPath = "content/%s/" % (sku)
-		
-		sharedCompiled = "data/sys.shared/compiled/game"
-		sharedBuilt = "data/sys.shared/built/game"
-		
-		serverCompiled = "data/sys.server/compiled/game"
-		serverBuilt = "data/sys.server/built/game"
-		
-		clientCompiled = "data/sys.client/compiled/game"
-		
-		if os.path.exists(skuPath + sharedCompiled):
-			cfg.write("searchPath2=../%s%s\n" % (skuPath, sharedCompiled))
-		
-		if os.path.exists(skuPath + sharedBuilt):
-			cfg.write("searchPath2=../%s%s\n" % (skuPath, sharedBuilt))
-		
-		if os.path.exists(skuPath + serverCompiled):
-			cfg.write("searchPath1=../%s%s\n" % (skuPath, serverCompiled))
-		
-		if os.path.exists(skuPath + serverBuilt):
-			cfg.write("searchPath1=../%s%s\n" % (skuPath, serverBuilt))
-		
-		if os.path.exists(skuPath + clientCompiled):
-			cfg.write("searchPath0=../%s%s\n" % (skuPath, clientCompiled))
-		
-	cfg.close()
+    cfg.write("[SharedFile]\n")
+    for sku in skus:
+        skuPath = "content/%s/" % (sku)
+
+        sharedCompiled = "data/sys.shared/compiled/game"
+        sharedBuilt = "data/sys.shared/built/game"
+
+        serverCompiled = "data/sys.server/compiled/game"
+        serverBuilt = "data/sys.server/built/game"
+
+        clientCompiled = "data/sys.client/compiled/game"
+
+        if os.path.exists(skuPath + sharedCompiled):
+            cfg.write("searchPath2=../%s%s\n" % (skuPath, sharedCompiled))
+
+        if os.path.exists(skuPath + sharedBuilt):
+            cfg.write("searchPath2=../%s%s\n" % (skuPath, sharedBuilt))
+
+        if os.path.exists(skuPath + serverCompiled):
+            cfg.write("searchPath1=../%s%s\n" % (skuPath, serverCompiled))
+
+        if os.path.exists(skuPath + serverBuilt):
+            cfg.write("searchPath1=../%s%s\n" % (skuPath, serverBuilt))
+
+        if os.path.exists(skuPath + clientCompiled):
+            cfg.write("searchPath0=../%s%s\n" % (skuPath, clientCompiled))
+
+    cfg.close()
 
 # build javac classpath and sourcepath
 dataPaths = []
@@ -178,7 +178,7 @@ for sku in skus:
 
     skuDataPath = skuPath + "/data/"
     skuDsrcPath = skuPath + "/dsrc/"
-	
+
     try:
         if not os.path.exists(skuDataPath + sysShared): os.makedirs(skuDataPath + sysShared)
         if not os.path.exists(skuDataPath + sysServer): os.makedirs(skuDataPath + sysServer)
@@ -210,8 +210,8 @@ for sku in skus:
                          ".tpf", ".iff",
                          "../../configs/bin/TemplateCompiler -compile $srcFile",
                          skuPath)
-						 
-	# build miff
+
+    # build miff
     walkAndCompareAndRun("dsrc/", "data/",
                          ".mif", ".iff",
                          "../../configs/bin/Miff -i $srcFile -o $dstFile",
