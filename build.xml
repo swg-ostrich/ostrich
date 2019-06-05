@@ -41,13 +41,9 @@
 	<property name="bin_home" location="${configs}/bin"/>
 	<property environment="env"/>
 
-	<!-- The init target handles the environment setup - not much to do but create directories -->
+	<!-- The init target handles the environment setup - not much to do -->
 	<target name="init">
 		<tstamp/>
-		<mkdir dir="${build}"/>
-		<mkdir dir="${data_server}"/>
-		<mkdir dir="${data_shared}"/>
-		<mkdir dir="${data_client}"/>
 	</target>
 
 	<target name="echoprops">
