@@ -55,7 +55,11 @@ def processTask( task ):
 
     # prepare tool run command
     cmd = toolCmd.replace("$srcFile", srcFile).replace("$dstFile", dstFile)
-    cmd = cmd.replace(toolCwd, "./", 1)
+	
+    if "searchPath" in toolCwd:
+          cmd = cmd.replace(toolCwd, "./", 1)
+	# mif files require all instances of the toolCwd to be replaced
+    else: cmd = cmd.replace(toolCwd, "./")
 
     # make sure destination folder exists
     dstFolder = os.path.dirname(dstFile)
@@ -110,7 +114,7 @@ def walkAndCompareAndRun( src, dst, srcExt, dstExt, runCmd, toolCwd ):
                     srcStat = os.stat(file)
                     dstStat = os.stat(dstFile)
 
-                    if srcStat.st_mtime > dstStat.st_mtime or buildAllFiles:
+                    if srcStat.st_mtime > dstStat.st_mtime or buildAllFiles or os.stat(dstFile).st_size == 0:
                         print "FILE %s NEEDS TO BE REBUILT" % (file)
                         q.put([runCmd, file, dstFile, toolCwd])
 
