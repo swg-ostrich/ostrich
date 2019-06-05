@@ -56,10 +56,14 @@ def processTask( task ):
     # prepare tool run command
     cmd = toolCmd.replace("$srcFile", srcFile).replace("$dstFile", dstFile)
 	
-    if "searchPath" in toolCwd:
-          cmd = cmd.replace(toolCwd, "./", 1)
-	# mif files require all instances of the toolCwd to be replaced
-    else: cmd = cmd.replace(toolCwd, "./")
+
+    # mif files require all instances of the toolCwd to be replaced
+    if "DataTableTool" in toolCmd: 
+        cmd = cmd.replace(toolCwd, "./", 1)
+    elif "Miff" in toolCmd: 
+        cmd = cmd.replace(toolCwd, "./", 2)
+    else:
+        cmd = cmd.replace(toolCwd, "./")
 
     # make sure destination folder exists
     dstFolder = os.path.dirname(dstFile)
@@ -70,6 +74,17 @@ def processTask( task ):
         pass
 
     # run the tool
+    retcode = -1
+
+	# only one .mif file can be compiled at a time
+    if "Miff" in toolCmd:
+        if not os.path.exists(".mif_lock"):
+            open(".mif_lock", 'a').close()
+        else:
+            time.sleep(0.5)
+            failedTasks.append(task)
+            return
+	
     if displayCmdOutput:
         print "> [%s] %s" % (toolCwd, cmd)
         retcode = subprocess.call(cmd, shell=True, cwd=toolCwd, stderr=subprocess.STDOUT)
@@ -77,6 +92,9 @@ def processTask( task ):
         FNULL = open(os.devnull, 'w')
         retcode = subprocess.call(cmd, shell=True, cwd=toolCwd, stdout=FNULL, stderr=subprocess.STDOUT)
 
+    # remove .mif_lock if we were building a .mif file
+    if "Miff" in toolCmd: os.remove(".mif_lock")
+		
     # validate dst file was successfully created and no errorcode
     if os.path.isfile(dstFile) is False or retcode is not 0 or os.stat(dstFile).st_size == 0:
         failedTasks.append(task)
@@ -218,7 +236,7 @@ for sku in skus:
     # build miff
     walkAndCompareAndRun("dsrc/", "data/",
                          ".mif", ".iff",
-                         "../../configs/bin/Miff -i $srcFile -o $dstFile",
+                         "../../configs/bin/Miff -i $srcFile -o $dstFile " + searchPath,
                          skuPath)
 
     # build scripts
@@ -253,7 +271,7 @@ displayQueueStatus()
 if len(failedTasks) > 0:
     previousFailedTaskCount = len(failedTasks) + 1
 
-    while previousFailedTaskCount > len(failedTasks):
+    while previousFailedTaskCount > len(failedTasks) or os.path.exists(".mif_lock"):
         previousFailedTaskCount = len(failedTasks)
         failedTasksCopy = copy.deepcopy(failedTasks)
 
