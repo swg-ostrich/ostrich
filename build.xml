@@ -21,9 +21,9 @@
 	<property name="data" location="data" relative="true" basedir="${basedir}"/>
 	<property name="chat_home" location="${basedir}/stationapi"/>
 	<property name="chat_build" location="${chat_home}/build"/>
-	<property name="clientdata" location="${basedir}/clientdata"/>
+	<property name="clientdata" location="${dsrc}/sku.0/data/sys.client/compiled/game"/>
 	<property name="configs" location="configs" relative="true" basedir="${basedir}"/>
-	<property name="dependencies" location="dependencies" relative="true" basedir="${basedir}"/>
+	<property name="dependencies" location="utils/initial-setup/dependencies" relative="true" basedir="${basedir}"/>
 
 	<!-- Setup Key Game Directories -->
 	<property name="dsrc_server" location="${dsrc}/sku.0/sys.server/compiled/game"/>
@@ -123,13 +123,13 @@
 		<git-update-submods dir="${basedir}"/>
 		<!-- Checkout branches from config -->
 		<git-checkout branch="${src_branch}" dir="${src}"/>
-		<git-checkout branch="${dsrc_branch}" dir="${dsrc}"/>
+		<git-checkout branch="${dsrc_branch}" dir="${dsrc}/sku.0/dsrc"/>
 		<git-checkout branch="${configs_branch}" dir="${configs}/example"/>
 		<git-checkout branch="${clientdata_branch}" dir="${clientdata}"/>
 		<git-checkout branch="${dependencies_branch}" dir="${dependencies}"/>
 		<!-- Pull latest changes from remote -->
 		<git-pull branch="${src_branch}" dir="${src}"/>
-		<git-pull branch="${dsrc_branch}" dir="${dsrc}"/>
+		<git-pull branch="${dsrc_branch}" dir="${dsrc}/sku.0/dsrc"/>
 		<git-pull branch="${configs_branch}" dir="${configs}/example"/>
 		<git-pull branch="${clientdata_branch}" dir="${clientdata}"/>
 		<git-pull branch="${dependencies_branch}" dir="${dependencies}"/>
@@ -318,7 +318,6 @@
 	</target>
 
 	<target name="create_symlinks">
-		<symlink link="${basedir}/data/sku.0/sys.client/compiled/game" resource="${clientdata}" overwrite="true"/>
 		<symlink link="${configs}/bin" resource="${tools_home}" overwrite="true"/>
 	</target>
 
